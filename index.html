@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Math with Yendi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: one expedition screen — mountain trail on the left shows progress, question card on the right; stacks on phones. Single morning-sky look by choice. */
+:root{
+  --sky:#DDEFF6;
+  --sky-deep:#B9DDEB;
+  --forest:#1F5B3F;
+  --forest-2:#2E7A55;
+  --moss:#7FB069;
+  --earth:#C9822B;
+  --earth-soft:#F6E3C3;
+  --paper:#FFFDF7;
+  --ink:#17322A;
+  --ink-soft:#4C6A5F;
+  --good:#2F8F4E;
+  --bad:#C2452D;
+  --line:#CFE0D6;
+  --font-display:"Fredoka","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  --font-body:"Lexend","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.15}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--earth);outline-offset:2px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{flex:none}
+.brand h1{font-size:clamp(22px,3.4vw,30px);color:var(--forest)}
+.brand small{display:block;font-family:var(--font-body);font-size:13px;color:var(--ink-soft);font-weight:500}
+.iconbtn{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--ink);font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.iconbtn:hover{border-color:var(--forest-2)}
+
+/* screens */
+.screen[hidden]{display:none!important}
+.panel{background:var(--paper);border-radius:22px;box-shadow:0 6px 0 var(--sky-deep);padding:clamp(18px,3vw,32px)}
+
+/* start screen */
+.start{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:start}
+.hero h2{font-size:clamp(30px,5vw,52px);color:var(--forest);font-weight:700}
+.hero p{color:var(--ink-soft);max-width:46ch;margin:12px 0 0}
+.hero .scene{margin-top:18px;border-radius:18px;overflow:hidden;background:var(--sky-deep)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.legend{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.field input{border:2px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;background:#fff;color:var(--ink)}
+.form{display:flex;flex-direction:column;gap:20px}
+.topics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.topic{text-align:left;border:2px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;color:var(--ink);display:flex;flex-direction:column;gap:2px;min-height:76px}
+.topic b{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--forest)}
+.topic span{font-size:13px;color:var(--ink-soft)}
+.topic[aria-pressed="true"]{border-color:var(--forest-2);background:#EEF7F0;box-shadow:inset 0 0 0 1px var(--forest-2)}
+.topic.all{grid-column:1/-1;min-height:0}
+.levels{display:flex;gap:8px;flex-wrap:wrap}
+.level{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;color:var(--ink);font-weight:500}
+.level[aria-pressed="true"]{background:var(--forest);border-color:var(--forest);color:#fff}
+.go{background:var(--earth);color:#fff;border:0;border-radius:16px;padding:16px 22px;font-family:var(--font-display);font-size:22px;font-weight:600;box-shadow:0 5px 0 #9A5F18;transition:transform .08s}
+.go:active{transform:translateY(3px);box-shadow:0 2px 0 #9A5F18}
+.best{font-size:14px;color:var(--ink-soft)}
+
+/* game screen */
+.game{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:20px;align-items:start}
+.trail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);padding:14px}
+#trailScene svg{display:block;width:100%;height:auto;border-radius:14px}
+.hero .scene svg{display:block;width:100%;height:auto}
+.stats{display:flex;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column}
+.stat .k{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)}
+.stat .v{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--forest);font-variant-numeric:tabular-nums}
+.leaves{display:flex;gap:4px;align-items:center;height:30px}
+.leaves .leaf{width:24px;height:24px;flex:none}
+.leaf.lost{opacity:.18;filter:grayscale(1)}
+
+.card{display:flex;flex-direction:column;gap:16px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{background:var(--earth-soft);color:#7A4A10;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
+.qnum{font-size:14px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.timer{height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:var(--moss);transform-origin:left;transition:background .3s}
+.timer.low i{background:var(--bad)}
+.question{font-family:var(--font-display);font-size:clamp(22px,3.2vw,32px);font-weight:500;color:var(--ink);min-height:2.4em}
+.story{font-family:var(--font-body);font-size:clamp(16px,2vw,19px);font-weight:400;line-height:1.55}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 .12em;font-variant-numeric:tabular-nums}
+.frac .n{padding:0 .15em .08em;border-bottom:.08em solid currentColor}
+.frac .d{padding:.08em .15em 0}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ans{border:2px solid var(--line);background:#fff;border-radius:16px;padding:16px 12px;font-family:var(--font-display);font-size:clamp(20px,2.6vw,26px);font-weight:500;color:var(--ink);display:flex;align-items:center;gap:12px;min-height:72px;text-align:left;box-shadow:0 4px 0 var(--line);transition:transform .08s,border-color .15s}
+.ans:hover:not(:disabled){border-color:var(--forest-2)}
+.ans:active:not(:disabled){transform:translateY(2px)}
+.ans .key{flex:none;width:28px;height:28px;border-radius:8px;background:var(--sky);color:var(--ink-soft);font-family:var(--font-body);font-size:14px;font-weight:600;display:grid;place-items:center}
+.ans.right{border-color:var(--good);background:#E8F6EC;box-shadow:0 4px 0 #A9D8B6}
+.ans.wrong{border-color:var(--bad);background:#FBEAE6;box-shadow:0 4px 0 #EBB9AE}
+.ans:disabled{cursor:default}
+.feedback{border-radius:14px;padding:14px 16px;background:var(--sky);display:flex;flex-direction:column;gap:6px}
+.feedback.ok{background:#E8F6EC}
+.feedback.no{background:#FBEAE6}
+.feedback h3{font-size:20px}
+.feedback.ok h3{color:var(--good)}
+.feedback.no h3{color:var(--bad)}
+.feedback p{margin:0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.next{background:var(--forest);color:#fff;border:0;border-radius:14px;padding:12px 20px;font-family:var(--font-display);font-size:19px;font-weight:600;box-shadow:0 4px 0 #123B28}
+.hint{background:transparent;border:2px dashed var(--earth);color:#8A5414;border-radius:12px;padding:8px 14px;font-weight:500}
+.hintbox{background:var(--earth-soft);border-radius:12px;padding:10px 14px;font-size:15px}
+
+/* result */
+.result{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.result h2{font-size:clamp(28px,4.4vw,44px);color:var(--forest)}
+.stars{display:flex;gap:8px;margin:14px 0}
+.stars svg{width:52px;height:52px}
+.big{font-family:var(--font-display);font-size:64px;font-weight:700;color:var(--earth);line-height:1;font-variant-numeric:tabular-nums}
+.recap{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:460px;overflow:auto}
+.recap li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:14px}
+.recap .mark{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.recap .mark.y{background:var(--good)}
+.recap .mark.n{background:var(--bad)}
+.recap .q{font-weight:500}
+.recap .a{color:var(--ink-soft)}
+.note{font-size:13px;color:var(--ink-soft);margin:0}
+.share{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 18px}
+.share .note{flex-basis:100%}
+.wa{display:inline-flex;align-items:center;gap:8px;background:#1D8A4E;color:#fff;text-decoration:none;border-radius:14px;padding:12px 18px;font-weight:600;box-shadow:0 4px 0 #136437}
+.wa:hover{background:#18784A}
+.foot{margin-top:10px;font-size:13px;color:var(--ink-soft)}
+.credit{margin-top:24px;padding:14px 18px;border-radius:16px;background:var(--forest);color:#EAF4EE;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.credit b{color:#fff}
+.byline{display:inline-block;margin-top:14px;background:var(--earth-soft);color:#7A4A10;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+
+@media (max-width:820px){
+  .start,.game,.result{grid-template-columns:minmax(0,1fr)}
+  .trail{position:static;padding:10px}
+  #trailScene svg{max-height:22vh;width:auto;max-width:100%;margin:0 auto}
+  .stats{margin-top:6px}
+  .stat .v{font-size:20px}
+  .game{gap:12px}
+}
+@media (max-width:460px){
+  .answers{grid-template-columns:minmax(0,1fr);gap:8px}
+  .ans{min-height:54px;padding:10px 12px;gap:10px;font-size:20px}
+  .question{min-height:0}
+  .story{font-size:16px;line-height:1.45}
+  .card{gap:12px}
+  .top{margin-bottom:12px}
+  .topics{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.96)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="21" fill="#1F5B3F"/><path d="M7 32 L18 15 L24 24 L28 19 L37 32 Z" fill="#7FB069"/><circle cx="31" cy="12" r="4" fill="#C9822B"/></svg>
+      <h1>Math with Yendi<small>Jelajah Gunung Matematika · Kelas 5 SD</small></h1>
+    </div>
+    <button class="iconbtn" id="soundBtn" type="button" aria-pressed="true">Suara: Nyala</button>
+  </header>
+
+  <!-- START -->
+  <section class="screen" id="startScreen">
+    <div class="start">
+      <div class="panel hero">
+        <h2>Daki gunung dengan menjawab soal.</h2>
+        <span class="byline">Bersama Pak Yendi</span>
+        <p>Setiap jawaban benar membawamu naik satu pos. Jawab 10 soal untuk sampai di puncak. Kamu punya 3 daun nyawa, jadi hati-hati.</p>
+        <div class="scene" id="heroScene"></div>
+      </div>
+      <form class="panel form" id="setupForm" autocomplete="off">
+        <div class="field">
+          <label for="playerName">Nama penjelajah</label>
+          <input id="playerName" maxlength="20" placeholder="Contoh: Ayesha" value="">
+        </div>
+        <div class="field">
+          <label for="parentPhone">No. WhatsApp orang tua (opsional)</label>
+          <input id="parentPhone" type="tel" inputmode="tel" maxlength="16" placeholder="Contoh: 0812 3456 7890" value="">
+          <span class="note" id="phoneNote">Hasil latihan bisa dikirim ke nomor ini setelah selesai bermain.</span>
+        </div>
+        <div>
+          <div class="legend" id="topicLegend">Pilih jalur</div>
+          <div class="topics" role="group" aria-labelledby="topicLegend" id="topicList"></div>
+        </div>
+        <div>
+          <div class="legend" id="levelLegend">Tingkat kesulitan</div>
+          <div class="levels" role="group" aria-labelledby="levelLegend" id="levelList"></div>
+        </div>
+        <button class="go" type="submit">Mulai mendaki</button>
+        <div class="best" id="bestLine"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section class="screen" id="gameScreen" hidden>
+    <div class="game">
+      <aside class="panel trail">
+        <div id="trailScene"></div>
+        <div class="stats">
+          <div class="stat"><span class="k">Skor</span><span class="v" id="score">0</span></div>
+          <div class="stat"><span class="k">Pos</span><span class="v" id="pos">0/10</span></div>
+          <div class="stat"><span class="k">Nyawa</span><span class="leaves" id="lives"></span></div>
+        </div>
+      </aside>
+      <div class="panel card" id="card">
+        <div class="qhead">
+          <span class="chip" id="qTopic">Pecahan</span>
+          <span class="qnum" id="qNum">Soal 1 dari 10</span>
+        </div>
+        <div class="timer" id="timer" aria-hidden="true"><i id="timerBar"></i></div>
+        <div class="question" id="question" aria-live="polite"></div>
+        <div class="answers" id="answers"></div>
+        <div class="row">
+          <button class="hint" type="button" id="hintBtn">Petunjuk (−5 poin)</button>
+          <span class="qnum" id="timeLeft"></span>
+        </div>
+        <div class="hintbox" id="hintBox" hidden></div>
+        <div class="feedback" id="feedback" hidden>
+          <h3 id="fbTitle"></h3>
+          <p id="fbText"></p>
+          <div class="row"><button class="next" type="button" id="nextBtn">Lanjut</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="resultScreen" hidden>
+    <div class="result">
+      <div class="panel">
+        <h2 id="resTitle">Sampai di puncak!</h2>
+        <div class="stars" id="stars"></div>
+        <div class="big" id="resScore">0</div>
+        <p id="resText"></p>
+        <div class="share">
+          <a class="wa" id="waLink" href="https://wa.me/" target="_blank" rel="noopener">
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.6 7.6c.3-.6.6-.6.9-.6h.6c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.5.7c-.1.2-.2.3 0 .6.6 1 1.4 1.8 2.4 2.4.3.2.4.1.6 0l.7-.8c.2-.2.3-.2.6-.1l1.8.9c.3.1.4.2.4.4 0 .5-.2 1.4-1.2 1.8-.8.3-1.9.4-4-.7-2.1-1.1-3.5-3.2-3.8-3.8-.4-.6-.9-1.8-.3-3.2Z" fill="currentColor"/></svg>
+            <span id="waLabel">Kirim hasil ke WhatsApp orang tua</span>
+          </a>
+          <button class="iconbtn" type="button" id="copyBtn">Salin pesan</button>
+          <p class="note" id="waNote"></p>
+        </div>
+        <div class="row">
+          <button class="go" type="button" id="againBtn">Daki lagi</button>
+          <button class="iconbtn" type="button" id="menuBtn">Ganti jalur</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 style="font-size:22px;color:var(--forest);margin-bottom:12px">Pembahasan</h3>
+        <ul class="recap" id="recap"></ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="credit">
+    <div><b>Math with Yendi</b> dibuat oleh Pak Yendi Septiyendi, S.Kom., Gr. · Guru Informatika & Matematika</div>
+    <div>Instagram <b>@pakyendi.id</b> · Les privat Matematika & konsultasi sekolah alam</div>
+  </footer>
+  <p class="foot">Soal dibuat acak setiap permainan, jadi bisa dimainkan berkali-kali. Tombol 1–4 pada keyboard bisa dipakai untuk menjawab, Enter untuk lanjut.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const rnd = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a; };
+const lcm = (a,b) => a/gcd(a,b)*b;
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const fmt = n => { // Indonesian number format, comma decimal
+  const r = Math.round(n*1000)/1000;
+  const s = r.toLocaleString('id-ID',{maximumFractionDigits:3});
+  return s;
+};
+// fraction object {n,d} simplified, d>0
+const F = (n,d) => { const g=gcd(n,d)||1; return {n:n/g,d:d/g}; };
+const fval = f => f.n/f.d;
+const fhtml = (f) => {
+  if (f.d===1) return String(f.n);
+  const whole = Math.trunc(f.n/f.d), rem = f.n % f.d;
+  if (whole>0 && rem>0) return `${whole}<span class="frac"><span class="n">${rem}</span><span class="d">${f.d}</span></span>`;
+  return `<span class="frac"><span class="n">${f.n}</span><span class="d">${f.d}</span></span>`;
+};
+const ftext = f => {
+  if (f.d===1) return String(f.n);
+  const whole = Math.trunc(f.n/f.d), rem = f.n % f.d;
+  if (whole>0 && rem>0) return `${whole} ${rem}/${f.d}`;
+  return `${f.n}/${f.d}`;
+};
+const fr = (n,d) => fhtml({n,d}); // unsimplified display
+
+/* Build options: correct + distractors (unique by value key). */
+function options(correct, distractors, keyFn, showFn){
+  const seen = new Set([keyFn(correct)]);
+  const out = [{v:correct, ok:true}];
+  for (const d of distractors){
+    if (out.length>=4) break;
+    if (d===null||d===undefined) continue;
+    const k = keyFn(d);
+    if (k===null || seen.has(k)) continue;
+    seen.add(k); out.push({v:d, ok:false});
+  }
+  return shuffle(out).map(o => ({html: showFn(o.v), ok:o.ok}));
+}
+function numOptions(correct, extra, unit=''){
+  const cands = [...extra];
+  // fallback nearby values
+  let step = Math.max(1, Math.round(Math.abs(correct)*0.1));
+  for (let i=1; cands.length<12; i++){ cands.push(correct+step*i, correct-step*i); }
+  return options(correct, cands.filter(x=>x>0), x=>String(Math.round(x*1000)/1000), x=>fmt(x)+(unit?` ${unit}`:''));
+}
+function fracOptions(correct, extra){
+  const cands = extra.filter(f=>f && f.d>0 && f.n>0).map(f=>F(f.n,f.d));
+  // nearby fallbacks
+  for (let i=1; cands.length<12; i++){ cands.push(F(correct.n+i, correct.d)); if (correct.n-i>0) cands.push(F(correct.n-i, correct.d)); cands.push(F(correct.n, correct.d+i)); }
+  return options(correct, cands, f=>`${f.n}/${f.d}`, fhtml);
+}
+
+/* ---------- question banks ---------- */
+const LV = {mudah:0, sedang:1, sulit:2};
+
+const TOPICS = [
+ {id:'pecahan', name:'Pecahan', desc:'Jumlah, kurang, kali pecahan', gen:genPecahan},
+ {id:'desimal', name:'Desimal & Persen', desc:'Ubah bentuk, persen dari bilangan', gen:genDesimal},
+ {id:'kpk', name:'KPK & FPB', desc:'Kelipatan dan faktor, soal cerita', gen:genKPK},
+ {id:'volume', name:'Volume Bangun Ruang', desc:'Kubus, balok, liter', gen:genVolume},
+ {id:'kecepatan', name:'Kecepatan & Debit', desc:'Jarak, waktu, kecepatan, debit', gen:genKecepatan},
+];
+
+function genPecahan(lv){
+  const maxD = [6,10,12][lv];
+  const type = pick(lv===0 ? ['add','add','sub'] : ['add','sub','mul', lv===2?'mixed':'add']);
+  let b = rnd(2,maxD), d = rnd(2,maxD);
+  while (d===b && lv>0) d = rnd(2,maxD);
+  let a = rnd(1,b-1), c = rnd(1,d-1);
+  if (type==='add'){
+    const ans = F(a*d+c*b, b*d);
+    const L = lcm(b,d);
+    return {
+      q:`${fr(a,b)} + ${fr(c,d)} = ...`,
+      opts: fracOptions(ans,[F(a+c,b+d), {n:a+c,d:Math.max(b,d)}, F(a*c,b*d), F(a*d+c*b+L/ (L/1) ,b*d)]),
+      hint:`Samakan penyebutnya dulu. KPK dari ${b} dan ${d} adalah ${L}.`,
+      exp:`Ubah ke penyebut ${L}: ${a*(L/b)}/${L} + ${c*(L/d)}/${L} = ${a*(L/b)+c*(L/d)}/${L} = ${ftext(ans)}.`,
+      plain:`${a}/${b} + ${c}/${d}`, ansText: ftext(ans)
+    };
+  }
+  if (type==='sub'){
+    if (a/b < c/d){ [a,b,c,d]=[c,d,a,b]; }
+    if (a*d===c*b){ a = Math.min(b-1,a+1); if (a*d<=c*b){ a=b-1; c=1; d = d<2?2:d; } }
+    if (a*d<=c*b) { a=b-1; c=1; d=b+1; }
+    const ans = F(a*d-c*b, b*d);
+    const L = lcm(b,d);
+    return {
+      q:`${fr(a,b)} − ${fr(c,d)} = ...`,
+      opts: fracOptions(ans,[Math.abs(a-c)>0 && b!==d ? F(Math.abs(a-c),Math.abs(b-d)||1):null, F(a*d+c*b,b*d), {n:Math.abs(a-c)||1,d:Math.max(b,d)}]),
+      hint:`Samakan penyebutnya dulu. KPK dari ${b} dan ${d} adalah ${L}.`,
+      exp:`Ubah ke penyebut ${L}: ${a*(L/b)}/${L} − ${c*(L/d)}/${L} = ${a*(L/b)-c*(L/d)}/${L} = ${ftext(ans)}.`,
+      plain:`${a}/${b} − ${c}/${d}`, ansText: ftext(ans)
+    };
+  }
+  if (type==='mul'){
+    const ans = F(a*c, b*d);
+    return {
+      q:`${fr(a,b)} × ${fr(c,d)} = ...`,
+      opts: fracOptions(ans,[F(a*d+c*b,b*d), F(a*d,b*c), F(a+c,b+d)]),
+      hint:`Kalikan pembilang dengan pembilang, penyebut dengan penyebut.`,
+      exp:`(${a}×${c})/(${b}×${d}) = ${a*c}/${b*d} = ${ftext(ans)}.`,
+      plain:`${a}/${b} × ${c}/${d}`, ansText: ftext(ans)
+    };
+  }
+  // mixed: whole number times fraction story
+  const n = rnd(2,6)*b;
+  const ans = n/b*a;
+  const item = pick(['kelereng','buku','bibit pohon','kue']);
+  return {
+    q:`<span class="story">Bu Rina punya ${n} ${item}. Sebanyak ${fr(a,b)} bagian dibagikan ke murid. Berapa ${item} yang dibagikan?</span>`,
+    opts: numOptions(ans,[n/b, n-ans, n*a, ans+a]),
+    hint:`Hitung ${a}/${b} × ${n}. Bagi dulu ${n} dengan ${b}, lalu kalikan ${a}.`,
+    exp:`${n} : ${b} = ${n/b}, lalu ${n/b} × ${a} = ${ans} ${item}.`,
+    plain:`${a}/${b} dari ${n} ${item}`, ansText:`${ans}`
+  };
+}
+
+function genDesimal(lv){
+  const type = pick(lv===0 ? ['f2p','pOf','d2f'] : ['f2p','pOf','d2f','dadd', lv===2?'diskon':'pOf']);
+  if (type==='f2p'){
+    const pairs = [[1,2],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,10],[3,10],[7,10],[1,20],[3,20],[9,20],[1,25],[6,25],[1,50],[7,50]];
+    const [a,b] = pick(lv===0?pairs.slice(0,9):pairs);
+    const ans = a/b*100;
+    return {
+      q:`${fr(a,b)} = ... %`,
+      opts: numOptions(ans,[a*10, b, ans/10, 100-ans, a*b],'%'),
+      hint:`Ubah penyebut menjadi 100, atau kalikan pecahan dengan 100%.`,
+      exp:`${a}/${b} × 100% = ${fmt(ans)}%.`, plain:`${a}/${b} = ...%`, ansText:`${fmt(ans)}%`
+    };
+  }
+  if (type==='pOf'){
+    const p = pick(lv===0?[10,25,50]:[10,20,25,30,40,50,60,75]);
+    const base = pick(lv===0?[20,40,60,80,100,120,200]:[40,60,80,120,160,240,300,400,500,800]);
+    const ans = p*base/100;
+    return {
+      q:`${p}% dari ${base} = ...`,
+      opts: numOptions(ans,[base-ans, p+base, base/p, ans*10]),
+      hint:`${p}% artinya ${p}/100. Kalikan ${p}/100 × ${base}.`,
+      exp:`${p}/100 × ${base} = ${fmt(ans)}.`, plain:`${p}% dari ${base}`, ansText:fmt(ans)
+    };
+  }
+  if (type==='d2f'){
+    const dens = lv===0?[10]:[10,100];
+    const den = pick(dens);
+    let num = rnd(1,den-1);
+    if (den===100 && num%10===0) num += rnd(1,9);
+    const ans = F(num,den);
+    const dec = num/den;
+    return {
+      q:`${fmt(dec)} = ... (pecahan paling sederhana)`,
+      opts: fracOptions(ans,[{n:num,d:den*10}, F(den,num), {n:num+1,d:den}, {n:num, d: den===10?100:10}]),
+      hint:`${fmt(dec)} dibaca per ${den===10?'sepuluh':'seratus'}. Tulis sebagai ${num}/${den}, lalu sederhanakan.`,
+      exp:`${fmt(dec)} = ${num}/${den} = ${ftext(ans)}.`, plain:`${fmt(dec)} sebagai pecahan`, ansText:ftext(ans)
+    };
+  }
+  if (type==='dadd'){
+    const a = rnd(11,99)/10, b = rnd(11,99)/ (lv===2?100:10);
+    const sub = Math.random()<0.5 && a>b;
+    const ans = Math.round((sub?a-b:a+b)*100)/100;
+    return {
+      q:`${fmt(a)} ${sub?'−':'+'} ${fmt(b)} = ...`,
+      opts: numOptions(ans,[Math.round((sub?a+b:a-b)*100)/100, ans+0.1, ans-0.1, ans+1],''),
+      hint:`Luruskan tanda komanya, lalu hitung seperti bilangan bulat.`,
+      exp:`${fmt(a)} ${sub?'−':'+'} ${fmt(b)} = ${fmt(ans)}.`, plain:`${fmt(a)} ${sub?'−':'+'} ${fmt(b)}`, ansText:fmt(ans)
+    };
+  }
+  // diskon
+  const price = pick([40000,50000,60000,80000,120000,150000,200000]);
+  const p = pick([10,20,25,30,40,50]);
+  const ans = price*(100-p)/100;
+  const rp = x => 'Rp' + x.toLocaleString('id-ID');
+  return {
+    q:`<span class="story">Harga tas ${rp(price)}. Ada diskon ${p}%. Berapa harga yang harus dibayar?</span>`,
+    opts: options(ans,[price*p/100, price-p, ans+5000, ans-5000, price*(100-p-10)/100], x=>String(x), rp),
+    hint:`Hitung potongannya dulu: ${p}% × ${rp(price)}. Lalu kurangkan dari harga awal.`,
+    exp:`Potongan = ${p}/100 × ${rp(price)} = ${rp(price*p/100)}. Bayar = ${rp(price)} − ${rp(price*p/100)} = ${rp(ans)}.`,
+    plain:`Diskon ${p}% dari ${rp(price)}`, ansText:rp(ans)
+  };
+}
+
+function genKPK(lv){
+  const type = pick(lv===0 ? ['kpk','fpb'] : ['kpk','fpb','storyK','storyF']);
+  const smallPairs = [[4,6],[6,8],[3,4],[4,10],[6,9],[8,12],[5,15],[6,10],[9,12],[10,15]];
+  const bigPairs = [[12,18],[15,20],[16,24],[18,24],[20,30],[24,36],[14,21],[18,27],[30,45],[28,42]];
+  const [a,b] = pick(lv===2?bigPairs:(lv===1?smallPairs.concat(bigPairs.slice(0,4)):smallPairs));
+  const K = lcm(a,b), G = gcd(a,b);
+  if (type==='kpk') return {
+    q:`KPK dari ${a} dan ${b} adalah ...`,
+    opts: numOptions(K,[a*b, G, K*2, a+b]),
+    hint:`Tulis kelipatan ${a}: ${a}, ${a*2}, ${a*3}, ... dan kelipatan ${b}. Cari yang sama paling kecil.`,
+    exp:`Kelipatan persekutuan terkecil ${a} dan ${b} adalah ${K}.`, plain:`KPK ${a} dan ${b}`, ansText:String(K)
+  };
+  if (type==='fpb') return {
+    q:`FPB dari ${a} dan ${b} adalah ...`,
+    opts: numOptions(G,[K, Math.min(a,b), G*2>Math.min(a,b)?G+1:G*2, 1]),
+    hint:`Tulis faktor ${a} dan faktor ${b}. Cari faktor sama yang paling besar.`,
+    exp:`Faktor persekutuan terbesar ${a} dan ${b} adalah ${G}.`, plain:`FPB ${a} dan ${b}`, ansText:String(G)
+  };
+  if (type==='storyK'){
+    const h = pick(['07.00','08.00','06.30']);
+    const [hh,mm] = h.split('.').map(Number);
+    const t = hh*60+mm+K; const jam = `${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;
+    return {
+      q:`<span class="story">Lampu merah berkedip setiap ${a} menit, lampu hijau setiap ${b} menit. Keduanya berkedip bersama pukul ${h}. Pukul berapa mereka berkedip bersama lagi?</span>`,
+      opts: options(jam,[addMin(hh,mm,a*b),addMin(hh,mm,G),addMin(hh,mm,a+b),addMin(hh,mm,K*2)],x=>x,x=>'Pukul '+x),
+      hint:`Kejadian bersama berulang tiap KPK(${a}, ${b}) menit.`,
+      exp:`KPK ${a} dan ${b} = ${K} menit. ${h} + ${K} menit = pukul ${jam}.`, plain:`Lampu ${a} & ${b} menit dari ${h}`, ansText:'Pukul '+jam
+    };
+  }
+  const x = G*rnd(2,4), y = G*rnd(3,5);
+  const g2 = gcd(x,y);
+  return {
+    q:`<span class="story">Ada ${x} buku tulis dan ${y} pensil. Semuanya dibagi rata ke beberapa kantong dengan isi sama. Paling banyak berapa kantong yang bisa dibuat?</span>`,
+    opts: numOptions(g2,[lcm(x,y), x+y, Math.min(x,y), g2*2]),
+    hint:`Cari FPB dari ${x} dan ${y}.`,
+    exp:`FPB ${x} dan ${y} = ${g2}, jadi paling banyak ${g2} kantong. Tiap kantong berisi ${x/g2} buku dan ${y/g2} pensil.`,
+    plain:`Bagi rata ${x} buku & ${y} pensil`, ansText:`${g2} kantong`
+  };
+}
+function addMin(h,m,add){ const t=h*60+m+add; return `${String(Math.floor(t/60)%24).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`; }
+
+function genVolume(lv){
+  const type = pick(lv===0 ? ['kubus','balok'] : ['kubus','balok','sisi','liter', lv===2?'tinggi':'balok']);
+  if (type==='kubus'){
+    const s = rnd(2,[6,10,15][lv]);
+    const v = s**3;
+    return {
+      q:`Volume kubus dengan rusuk ${s} cm adalah ... cm³`,
+      opts: numOptions(v,[s*s, s*3, 6*s*s, s*s*2],'cm³'),
+      hint:`Volume kubus = rusuk × rusuk × rusuk.`,
+      exp:`${s} × ${s} × ${s} = ${v} cm³.`, plain:`Volume kubus rusuk ${s} cm`, ansText:`${v} cm³`
+    };
+  }
+  if (type==='balok'){
+    const p = rnd(3,[8,15,25][lv]), l = rnd(2,[6,10,15][lv]), t = rnd(2,[6,10,12][lv]);
+    const v = p*l*t;
+    return {
+      q:`Volume balok dengan panjang ${p} cm, lebar ${l} cm, dan tinggi ${t} cm adalah ... cm³`,
+      opts: numOptions(v,[p+l+t, p*l, 2*(p*l+p*t+l*t), p*l*t+p],'cm³'),
+      hint:`Volume balok = panjang × lebar × tinggi.`,
+      exp:`${p} × ${l} × ${t} = ${v} cm³.`, plain:`Volume balok ${p}×${l}×${t}`, ansText:`${v} cm³`
+    };
+  }
+  if (type==='sisi'){
+    const s = rnd(2,[5,9,12][lv]);
+    return {
+      q:`Sebuah kubus volumenya ${s**3} cm³. Panjang rusuknya ... cm`,
+      opts: numOptions(s,[s+1,s-1>0?s-1:s+2,s*2,Math.round(s**3/3)],'cm'),
+      hint:`Cari bilangan yang jika dikalikan tiga kali dengan dirinya sendiri hasilnya ${s**3}.`,
+      exp:`${s} × ${s} × ${s} = ${s**3}, jadi rusuknya ${s} cm.`, plain:`Rusuk kubus bervolume ${s**3} cm³`, ansText:`${s} cm`
+    };
+  }
+  if (type==='liter'){
+    const p = rnd(3,8)*10, l = rnd(2,6)*10, t = rnd(2,5)*10;
+    const L = p*l*t/1000;
+    return {
+      q:`<span class="story">Akuarium berbentuk balok berukuran ${p} cm × ${l} cm × ${t} cm. Berapa liter air untuk mengisinya penuh?</span>`,
+      opts: numOptions(L,[p*l*t/100, p*l*t/10000*10, L*10, L/10],'liter'),
+      hint:`Hitung volume dalam cm³, lalu ingat 1 liter = 1.000 cm³.`,
+      exp:`${p} × ${l} × ${t} = ${fmt(p*l*t)} cm³ = ${fmt(L)} liter.`, plain:`Akuarium ${p}×${l}×${t} cm`, ansText:`${fmt(L)} liter`
+    };
+  }
+  const p = rnd(5,15), l = rnd(3,10), t = rnd(3,12);
+  return {
+    q:`Balok bervolume ${p*l*t} cm³ punya panjang ${p} cm dan lebar ${l} cm. Tingginya ... cm`,
+    opts: numOptions(t,[p*l, t+2, t*2, p+l],'cm'),
+    hint:`Tinggi = volume : (panjang × lebar).`,
+    exp:`${p*l*t} : (${p} × ${l}) = ${p*l*t} : ${p*l} = ${t} cm.`, plain:`Tinggi balok ${p*l*t} cm³`, ansText:`${t} cm`
+  };
+}
+
+function genKecepatan(lv){
+  const type = pick(lv===0 ? ['v','s'] : ['v','s','t','debit', lv===2?'menit':'t']);
+  if (type==='v'){
+    const t = rnd(2,[4,5,6][lv]), v = pick([20,30,40,45,50,60,70,80]);
+    const s = v*t;
+    return {
+      q:`<span class="story">Pak Ali naik motor sejauh ${s} km dalam ${t} jam. Berapa kecepatan rata-ratanya?</span>`,
+      opts: numOptions(v,[s*t, s+t, s-t, v*2],'km/jam'),
+      hint:`Kecepatan = jarak : waktu.`,
+      exp:`${s} km : ${t} jam = ${v} km/jam.`, plain:`${s} km dalam ${t} jam`, ansText:`${v} km/jam`
+    };
+  }
+  if (type==='s'){
+    const t = rnd(2,[4,5,6][lv]), v = pick([15,20,40,50,60,65,75]);
+    return {
+      q:`<span class="story">Bus melaju ${v} km/jam selama ${t} jam. Berapa jarak yang ditempuh?</span>`,
+      opts: numOptions(v*t,[v+t, v*(t+1), v/t, v*t*2],'km'),
+      hint:`Jarak = kecepatan × waktu.`,
+      exp:`${v} km/jam × ${t} jam = ${v*t} km.`, plain:`${v} km/jam selama ${t} jam`, ansText:`${v*t} km`
+    };
+  }
+  if (type==='t'){
+    const v = pick([20,30,40,50,60]), t = rnd(2,6);
+    return {
+      q:`<span class="story">Jarak dua kota ${v*t} km. Mobil melaju ${v} km/jam. Berapa jam waktu tempuhnya?</span>`,
+      opts: numOptions(t,[v*t*v, t+1, t*2, v],'jam'),
+      hint:`Waktu = jarak : kecepatan.`,
+      exp:`${v*t} km : ${v} km/jam = ${t} jam.`, plain:`${v*t} km dengan ${v} km/jam`, ansText:`${t} jam`
+    };
+  }
+  if (type==='debit'){
+    const d = pick([2,3,4,5,6,8,10]), m = rnd(3,12);
+    return {
+      q:`<span class="story">Keran mengalirkan air ${d} liter/menit. Berapa liter air setelah ${m} menit?</span>`,
+      opts: numOptions(d*m,[d+m, d*m*2, Math.round(m/d)||1, d*(m-1)],'liter'),
+      hint:`Volume = debit × waktu.`,
+      exp:`${d} liter/menit × ${m} menit = ${d*m} liter.`, plain:`Debit ${d} L/menit, ${m} menit`, ansText:`${d*m} liter`
+    };
+  }
+  // menit -> jam conversion
+  const v = pick([30,40,60,80]); const menit = pick([15,30,45,90,120]);
+  const s = v*menit/60;
+  return {
+    q:`<span class="story">Sepeda listrik melaju ${v} km/jam selama ${menit} menit. Berapa km jarak yang ditempuh?</span>`,
+    opts: numOptions(s,[v*menit, v*menit/100, s*2, v+menit],'km'),
+    hint:`Ubah menit ke jam dulu: ${menit} menit = ${fmt(menit/60)} jam.`,
+    exp:`${menit} menit = ${fmt(menit/60)} jam. ${v} × ${fmt(menit/60)} = ${fmt(s)} km.`, plain:`${v} km/jam selama ${menit} menit`, ansText:`${fmt(s)} km`
+  };
+}
+
+/* ---------- scenery ---------- */
+const N = 10;
+// trail checkpoints in a 400x320 scene, base (0) to summit (10)
+const PTS = [[60,292],[150,282],[250,268],[330,246],[262,222],[170,200],[110,172],[176,146],[248,120],[214,92],[200,58]];
+function sceneSVG(withTrail){
+  const path = PTS.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' ');
+  const posts = withTrail ? PTS.map((p,i)=>`<g class="post" data-i="${i}"><circle cx="${p[0]}" cy="${p[1]}" r="${i===N?0:6}" fill="#FFFDF7" stroke="#1F5B3F" stroke-width="2.5"/></g>`).join('') : '';
+  return `<svg viewBox="0 0 400 320" role="img" aria-label="Jalur pendakian menuju puncak gunung">
+    <rect width="400" height="320" fill="#DDEFF6"/>
+    <circle cx="330" cy="62" r="26" fill="#F2C46D"/>
+    <path d="M0 210 L70 150 L120 185 L170 130 L215 170 L260 120 L320 175 L400 140 L400 320 L0 320 Z" fill="#B9DDEB"/>
+    <path d="M10 320 L200 40 L390 320 Z" fill="#2E7A55"/>
+    <path d="M200 40 L232 88 L216 84 L204 96 L190 82 L172 90 Z" fill="#FFFDF7"/>
+    <path d="M200 40 L390 320 L300 320 Z" fill="#1F5B3F" opacity=".55"/>
+    <path d="M0 300 C80 284 140 300 200 296 C270 290 330 304 400 296 L400 320 L0 320 Z" fill="#7FB069"/>
+    ${[[40,288],[78,280],[352,290],[372,280],[22,300]].map(([x,y])=>`<path d="M${x} ${y} l9 -22 l9 22 Z" fill="#1F5B3F"/>`).join('')}
+    ${withTrail?`<path d="${path}" fill="none" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 9"/>`:''}
+    ${posts}
+    ${withTrail?`<g transform="translate(200 58)"><line x1="0" y1="0" x2="0" y2="-26" stroke="#17322A" stroke-width="2.5"/><path d="M0 -26 L20 -20 L0 -13 Z" fill="#C9822B"/></g>`:''}
+    ${withTrail?`<g id="climber" transform="translate(${PTS[0][0]} ${PTS[0][1]})" style="transition:transform .7s cubic-bezier(.3,1.4,.5,1)">
+       <circle r="11" fill="#C9822B" stroke="#FFFDF7" stroke-width="3"/>
+       <circle cx="0" cy="-2" r="3.4" fill="#FFFDF7"/><path d="M-5 5 Q0 1 5 5" stroke="#FFFDF7" stroke-width="2" fill="none"/>
+     </g>`:''}
+  </svg>`;
+}
+$('heroScene').innerHTML = sceneSVG(false);
+$('trailScene').innerHTML = sceneSVG(true);
+
+const LEAF = `<svg class="leaf" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 C4 10 10 4 20 4 C20 14 14 20 4 20 Z" fill="#2E7A55"/><path d="M5 19 L15 9" stroke="#FFFDF7" stroke-width="1.6"/></svg>`;
+const STAR = on => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 l2.9 6.1 6.6.8 -4.9 4.6 1.3 6.6 L12 17.3 6.1 20.6 7.4 14 2.5 9.4 l6.6-.8 Z" fill="${on?'#C9822B':'#CFE0D6'}"/></svg>`;
+
+/* ---------- sound ---------- */
+let soundOn = true, actx = null;
+function beep(freqs, dur=0.12){
+  if (!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    let t = actx.currentTime;
+    freqs.forEach(f=>{
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type='triangle'; o.frequency.value=f; o.connect(g); g.connect(actx.destination);
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.start(t); o.stop(t+dur+0.02); t += dur*0.9;
+    });
+  }catch(e){}
+}
+$('soundBtn').addEventListener('click', e=>{
+  soundOn = !soundOn; e.currentTarget.setAttribute('aria-pressed', soundOn);
+  e.currentTarget.textContent = 'Suara: ' + (soundOn?'Nyala':'Mati');
+});
+
+/* ---------- storage (best score per topic+level) ---------- */
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem('jgm:'+k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem('jgm:'+k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* ---------- setup screen ---------- */
+let state = {topic:'all', level:'sedang', name:''};
+const topicList = $('topicList');
+[...TOPICS, {id:'all', name:'Semua jalur', desc:'Campuran dari kelima topik'}].forEach(t=>{
+  const b = document.createElement('button');
+  b.type='button'; b.className='topic'+(t.id==='all'?' all':''); b.dataset.id=t.id;
+  b.innerHTML = `<b>${t.name}</b><span>${t.desc}</span>`;
+  b.setAttribute('aria-pressed', t.id===state.topic);
+  b.addEventListener('click',()=>{ state.topic=t.id; [...topicList.children].forEach(x=>x.setAttribute('aria-pressed', x.dataset.id===t.id)); updateBest(); });
+  topicList.appendChild(b);
+});
+const levelList = $('levelList');
+[['mudah','Mudah'],['sedang','Sedang'],['sulit','Sulit']].forEach(([id,label])=>{
+  const b = document.createElement('button');
+  b.type='button'; b.className='level'; b.dataset.id=id; b.textContent=label;
+  b.setAttribute('aria-pressed', id===state.level);
+  b.addEventListener('click',()=>{ state.level=id; [...levelList.children].forEach(x=>x.setAttribute('aria-pressed', x.dataset.id===id)); updateBest(); });
+  levelList.appendChild(b);
+});
+const savedName = store.get('name'); if (savedName) $('playerName').value = savedName;
+const savedPhone = store.get('phone'); if (savedPhone) $('parentPhone').value = savedPhone;
+// Normalise Indonesian numbers to 62xxxxxxxxxx; returns '' when empty, null when invalid
+function normPhone(raw){
+  let d = String(raw||'').replace(/[^0-9+]/g,'');
+  if (!d) return '';
+  d = d.replace(/^\+/,'');
+  if (d.startsWith('0')) d = '62' + d.slice(1);
+  else if (d.startsWith('8')) d = '62' + d;
+  return /^62\d{8,13}$/.test(d) ? d : null;
+}
+$('parentPhone').addEventListener('input', ()=>{
+  const v = normPhone($('parentPhone').value);
+  $('phoneNote').textContent = v===null ? 'Nomor belum lengkap. Contoh yang benar: 0812 3456 7890.' : 'Hasil latihan bisa dikirim ke nomor ini setelah selesai bermain.';
+});
+function topicName(id){ return id==='all' ? 'Semua jalur' : TOPICS.find(t=>t.id===id).name; }
+function updateBest(){
+  const b = store.get(`best:${state.topic}:${state.level}`);
+  $('bestLine').textContent = b ? `Rekor di perangkat ini untuk ${topicName(state.topic)} (${state.level}): ${b.score} poin oleh ${b.name}.` : `Belum ada rekor untuk ${topicName(state.topic)} (${state.level}). Jadilah yang pertama!`;
+}
+updateBest();
+
+/* ---------- game ---------- */
+const TIME = {mudah:45, sedang:30, sulit:25};
+let G = null, timerId = null;
+
+function newQuestion(){
+  const t = state.topic==='all' ? pick(TOPICS) : TOPICS.find(x=>x.id===state.topic);
+  let q;
+  for (let tries=0; tries<20; tries++){ q = t.gen(LV[state.level]); if (q.opts.length===4) break; }
+  q.topic = t.name; return q;
+}
+function startGame(){
+  state.name = ($('playerName').value.trim() || 'Penjelajah');
+  store.set('name', state.name);
+  const ph = normPhone($('parentPhone').value);
+  state.phone = ph || '';
+  store.set('phone', $('parentPhone').value.trim());
+  G = {i:0, pos:0, score:0, lives:3, log:[], q:null, answered:false, hinted:false, t0:0};
+  show('gameScreen');
+  moveClimber(0);
+  nextQuestion();
+}
+function show(id){ ['startScreen','gameScreen','resultScreen'].forEach(s=>$(s).hidden = s!==id); window.scrollTo({top:0,behavior:'smooth'}); }
+function renderLives(){ $('lives').innerHTML = [0,1,2].map(i=> LEAF.replace('class="leaf"', `class="leaf${i>=G.lives?' lost':''}"`)).join(''); }
+function moveClimber(p){
+  const c = document.getElementById('climber'); if (!c) return;
+  const [x,y] = PTS[Math.min(p,N)]; c.setAttribute('transform', `translate(${x} ${y})`);
+  document.querySelectorAll('#trailScene .post circle').forEach((el,i)=>{ el.setAttribute('fill', i<=p && i<N ? '#C9822B':'#FFFDF7'); });
+}
+function nextQuestion(){
+  if (G.i>=N || G.lives<=0) return finish();
+  G.q = newQuestion(); G.answered=false; G.hinted=false;
+  $('qTopic').textContent = G.q.topic;
+  $('qNum').textContent = `Soal ${G.i+1} dari ${N}`;
+  $('question').innerHTML = G.q.q;
+  $('hintBox').hidden = true; $('hintBtn').disabled = false;
+  $('feedback').hidden = true;
+  const box = $('answers'); box.innerHTML='';
+  G.q.opts.forEach((o,idx)=>{
+    const b = document.createElement('button'); b.type='button'; b.className='ans';
+    b.innerHTML = `<span class="key">${idx+1}</span><span>${o.html}</span>`;
+    b.addEventListener('click',()=>answer(idx));
+    box.appendChild(b);
+  });
+  $('score').textContent = G.score; $('pos').textContent = `${G.pos}/${N}`; renderLives();
+  $('card').classList.remove('pop'); void $('card').offsetWidth; $('card').classList.add('pop');
+  startTimer();
+}
+function startTimer(){
+  clearInterval(timerId);
+  const total = TIME[state.level]; G.t0 = performance.now();
+  const bar = $('timerBar'), tm = $('timer');
+  const tick = ()=>{
+    const left = Math.max(0, total - (performance.now()-G.t0)/1000);
+    bar.style.transform = `scaleX(${left/total})`;
+    tm.classList.toggle('low', left < total*0.25);
+    $('timeLeft').textContent = `Sisa waktu ${Math.ceil(left)} detik`;
+    if (left<=0){ clearInterval(timerId); answer(-1); }
+  };
+  tick(); timerId = setInterval(tick, 200);
+}
+function answer(idx){
+  if (G.answered) return; G.answered = true; clearInterval(timerId);
+  const btns = [...$('answers').children];
+  const correctIdx = G.q.opts.findIndex(o=>o.ok);
+  btns.forEach((b,i)=>{ b.disabled=true; if (i===correctIdx) b.classList.add('right'); });
+  const ok = idx===correctIdx;
+  const fb = $('feedback'); fb.hidden=false; fb.className = 'feedback ' + (ok?'ok':'no');
+  if (ok){
+    const left = Math.max(0, TIME[state.level] - (performance.now()-G.t0)/1000);
+    const gain = 10 + Math.round(left/TIME[state.level]*10) - (G.hinted?5:0);
+    G.score += Math.max(5,gain); G.pos++;
+    $('fbTitle').textContent = pick(['Benar! Naik satu pos.','Mantap, kamu naik!','Tepat sekali!','Hebat, terus mendaki!']);
+    beep([523,659,784]);
+  } else {
+    if (idx>=0) btns[idx].classList.add('wrong');
+    G.lives--;
+    $('fbTitle').textContent = idx<0 ? 'Waktu habis. Satu daun gugur.' : 'Belum tepat. Satu daun gugur.';
+    $('card').classList.remove('shake'); void $('card').offsetWidth; $('card').classList.add('shake');
+    beep([330,247],0.16);
+  }
+  $('fbText').innerHTML = `<b>Pembahasan:</b> ${G.q.exp}`;
+  G.log.push({q:G.q.plain, a:G.q.ansText, ok, exp:G.q.exp});
+  G.i++;
+  $('score').textContent = G.score; $('pos').textContent = `${G.pos}/${N}`; renderLives(); moveClimber(G.pos);
+  $('nextBtn').textContent = (G.i>=N || G.lives<=0) ? 'Lihat hasil' : 'Lanjut';
+  $('hintBtn').disabled = true;
+  $('nextBtn').focus({preventScroll:true});
+}
+$('nextBtn').addEventListener('click', nextQuestion);
+$('hintBtn').addEventListener('click', ()=>{ if (G.answered) return; G.hinted = true; $('hintBox').hidden=false; $('hintBox').textContent = G.q.hint; $('hintBtn').disabled = true; });
+
+function finish(){
+  clearInterval(timerId);
+  const correct = G.log.filter(l=>l.ok).length;
+  const stars = G.pos>=N ? (G.lives===3?3:2) : (correct>=5?1:0);
+  $('resTitle').textContent = G.pos>=N ? `${state.name} sampai di puncak!` : `${state.name} berhenti di pos ${G.pos}.`;
+  $('stars').innerHTML = [0,1,2].map(i=>STAR(i<stars)).join('');
+  $('resScore').textContent = G.score;
+  const key = `best:${state.topic}:${state.level}`, best = store.get(key);
+  let rec = '';
+  if (G.score>0 && (!best || G.score > best.score)){ store.set(key,{score:G.score,name:state.name}); rec = ' Ini rekor baru di perangkat ini!'; }
+  $('resText').textContent = `${correct} dari ${G.log.length} soal benar di jalur ${topicName(state.topic)}, tingkat ${state.level}.${rec}` + (G.pos<N ? ' Coba lagi untuk mencapai puncak.' : '');
+  $('recap').innerHTML = G.log.map(l=>`<li><span class="mark ${l.ok?'y':'n'}">${l.ok?'✓':'✗'}</span><div><div class="q">${l.q}</div><div class="a">Jawaban: ${l.a}. ${l.exp}</div></div></li>`).join('');
+  // WhatsApp report for parents
+  const wrong = G.log.filter(l=>!l.ok);
+  const tgl = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const strip = s => s.replace(/<[^>]+>/g,'');
+  const msg = [
+    `Halo Bapak/Ibu, berikut hasil latihan matematika ${state.name} di *Math with Yendi*.`,
+    ``,
+    `Tanggal: ${tgl}`,
+    `Materi: ${topicName(state.topic)} (tingkat ${state.level})`,
+    `Benar: ${correct} dari ${G.log.length} soal`,
+    `Skor: ${G.score} · Bintang: ${stars}/3`,
+    `Status: ${G.pos>=N ? 'sampai di puncak' : 'berhenti di pos '+G.pos+' dari '+N}`,
+    ...(wrong.length ? [``, `Soal yang perlu dipelajari lagi:`, ...wrong.slice(0,5).map(l=>`- ${strip(l.q)} (jawaban: ${l.a})`)] : [``, `Semua soal dijawab benar. Hebat!`]),
+    ``,
+    `Main lagi: https://akaiyendi00itsar.github.io/math-with-yendi/`,
+    `Pak Yendi · @pakyendi.id`
+  ].join('\n');
+  G.msg = msg;
+  $('waLink').href = `https://wa.me/${state.phone}?text=${encodeURIComponent(msg)}`;
+  $('waLabel').textContent = state.phone ? 'Kirim hasil ke WhatsApp orang tua' : 'Kirim hasil lewat WhatsApp';
+  $('waNote').textContent = state.phone
+    ? `WhatsApp akan terbuka ke nomor +${state.phone} dengan pesan yang sudah terisi. Ketuk Kirim di WhatsApp.`
+    : `Nomor orang tua belum diisi, jadi pilih kontaknya sendiri di WhatsApp. Jika WhatsApp tidak terbuka, pakai Salin pesan.`;
+  $('copyBtn').textContent = 'Salin pesan';
+  if (G.pos>=N) beep([523,659,784,1047],0.15);
+  show('resultScreen');
+}
+$('setupForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  if (normPhone($('parentPhone').value)===null){ $('parentPhone').focus(); $('phoneNote').textContent='Nomor belum lengkap. Perbaiki atau kosongkan dulu.'; return; }
+  startGame();
+});
+$('copyBtn').addEventListener('click', ()=>{
+  const done = ()=>{ $('copyBtn').textContent = 'Pesan tersalin'; };
+  const fallback = ()=>{
+    const ta = document.createElement('textarea'); ta.value = G.msg; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ $('waNote').textContent = 'Tidak bisa menyalin otomatis di perangkat ini.'; } ta.remove();
+  };
+  try{ navigator.clipboard.writeText(G.msg).then(done, fallback); }catch(e){ fallback(); }
+});
+$('againBtn').addEventListener('click', startGame);
+$('menuBtn').addEventListener('click', ()=>{ updateBest(); show('startScreen'); });
+
+document.addEventListener('keydown', e=>{
+  if ($('gameScreen').hidden) return;
+  if (!G.answered && ['1','2','3','4'].includes(e.key)){ answer(Number(e.key)-1); }
+  else if (G.answered && e.key==='Enter' && document.activeElement!==$('nextBtn')){ nextQuestion(); }
+});
+})();
+</script>
+</body>
+</html>
