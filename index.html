@@ -130,6 +130,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .recap .q{font-weight:500}
 .recap .a{color:var(--ink-soft)}
 .note{font-size:13px;color:var(--ink-soft);margin:0}
+.note.err{color:var(--bad);font-weight:500}
+.req{color:var(--bad);text-transform:none;letter-spacing:0;font-weight:600}
+.field input.invalid{border-color:var(--bad);background:#FFF6F4}
 .share{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 18px}
 .share .note{flex-basis:100%}
 .wa{display:inline-flex;align-items:center;gap:8px;background:#1D8A4E;color:#fff;text-decoration:none;border-radius:14px;padding:12px 18px;font-weight:600;box-shadow:0 4px 0 #136437}
@@ -185,14 +188,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
         <p>Setiap jawaban benar membawamu naik satu pos. Jawab 10 soal untuk sampai di puncak. Kamu punya 3 daun nyawa, jadi hati-hati.</p>
         <div class="scene" id="heroScene"></div>
       </div>
-      <form class="panel form" id="setupForm" autocomplete="off">
+      <form class="panel form" id="setupForm" autocomplete="off" novalidate>
         <div class="field">
-          <label for="playerName">Nama penjelajah</label>
-          <input id="playerName" maxlength="20" placeholder="Contoh: Ayesha" value="">
+          <label for="playerName">Nama penjelajah <span class="req">*wajib</span></label>
+          <input id="playerName" maxlength="20" placeholder="Contoh: Ayesha" value="" required aria-describedby="nameNote">
+          <span class="note" id="nameNote">Tulis nama lengkap atau nama panggilan.</span>
         </div>
         <div class="field">
-          <label for="parentPhone">No. WhatsApp orang tua (opsional)</label>
-          <input id="parentPhone" type="tel" inputmode="tel" maxlength="16" placeholder="Contoh: 0812 3456 7890" value="">
+          <label for="parentPhone">No. WhatsApp orang tua <span class="req">*wajib</span></label>
+          <input id="parentPhone" type="tel" inputmode="tel" maxlength="16" placeholder="Contoh: 0812 3456 7890" value="" required aria-describedby="phoneNote">
           <span class="note" id="phoneNote">Hasil latihan bisa dikirim ke nomor ini setelah selesai bermain.</span>
         </div>
         <div>
@@ -835,7 +839,13 @@ function finish(){
 }
 $('setupForm').addEventListener('submit', e=>{
   e.preventDefault();
-  if (normPhone($('parentPhone').value)===null){ $('parentPhone').focus(); $('phoneNote').textContent='Nomor belum lengkap. Perbaiki atau kosongkan dulu.'; return; }
+  const nm = $('playerName').value.trim(), ph = normPhone($('parentPhone').value);
+  $('playerName').classList.toggle('invalid', !nm);
+  $('parentPhone').classList.toggle('invalid', !ph);
+  if (!nm){ $('nameNote').textContent='Nama penjelajah wajib diisi.'; $('nameNote').classList.add('err'); $('playerName').focus(); return; }
+  $('nameNote').textContent='Tulis nama lengkap atau nama panggilan.'; $('nameNote').classList.remove('err');
+  if (!ph){ $('phoneNote').textContent = ph===null ? 'Nomor belum lengkap. Contoh yang benar: 0812 3456 7890.' : 'Nomor WhatsApp orang tua wajib diisi.'; $('phoneNote').classList.add('err'); $('parentPhone').focus(); return; }
+  $('phoneNote').classList.remove('err');
   startGame();
 });
 $('copyBtn').addEventListener('click', ()=>{
