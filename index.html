@@ -3,172 +3,138 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Math with Yendi</title>
+<title>Hitung Pajak bersama Pak Yendi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lexend:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* Layout: one expedition screen — mountain trail on the left shows progress, question card on the right; stacks on phones. Single morning-sky look by choice. */
+/* Layout: form card on the left, live result "bukti hitung" on the right; stacks on phones. Ledger-paper feel for the result. */
 :root{
-  --sky:#DDEFF6;
-  --sky-deep:#B9DDEB;
-  --forest:#1F5B3F;
-  --forest-2:#2E7A55;
-  --moss:#7FB069;
-  --earth:#C9822B;
-  --earth-soft:#F6E3C3;
-  --paper:#FFFDF7;
-  --ink:#17322A;
-  --ink-soft:#4C6A5F;
-  --good:#2F8F4E;
-  --bad:#C2452D;
-  --line:#CFE0D6;
-  --font-display:"Fredoka","Trebuchet MS","Segoe UI",system-ui,sans-serif;
-  --font-body:"Lexend","Segoe UI",system-ui,sans-serif;
+  --bg:#F3F1EA;
+  --paper:#FFFFFF;
+  --ink:#1B2A33;
+  --ink-soft:#5A6A72;
+  --line:#DCD8CC;
+  --teal:#0F5C5C;
+  --teal-soft:#E3EFEC;
+  --amber:#B8741A;
+  --amber-soft:#FBEFD9;
+  --good:#2E7D4F;
+  --bad:#B23A2B;
+  --font:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
   color-scheme:light;
 }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121A1E;--paper:#1A252B;--ink:#E6ECEE;--ink-soft:#9DB0B7;--line:#2C3A41;--teal:#5FC2B6;--teal-soft:#183331;--amber:#E2A24E;--amber-soft:#33281A;--good:#6CC48E;--bad:#EE8A7C;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121A1E;--paper:#1A252B;--ink:#E6ECEE;--ink-soft:#9DB0B7;--line:#2C3A41;--teal:#5FC2B6;--teal-soft:#183331;--amber:#E2A24E;--amber-soft:#33281A;--good:#6CC48E;--bad:#EE8A7C;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{min-height:100%}
-body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5}
-.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
-h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.15}
-button{font:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--earth);outline-offset:2px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.2}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 
-/* header */
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-.brand{display:flex;align-items:center;gap:10px}
-.brand svg{flex:none}
-.brand h1{font-size:clamp(22px,3.4vw,30px);color:var(--forest)}
-.brand small{display:block;font-family:var(--font-body);font-size:13px;color:var(--ink-soft);font-weight:500}
-.iconbtn{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--ink);font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
-.iconbtn:hover{border-color:var(--forest-2)}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+header h1{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.01em}
+header h1 .with{color:var(--teal)}
+.brand{display:flex;gap:16px;align-items:center}
+.avatar{flex:none;border-radius:14px;object-fit:cover;max-width:none}
+.brand .avatar{box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--line)}
+.byline{font-size:13px;font-weight:600;color:var(--amber);margin-top:4px}
+.credit{margin-top:24px;display:flex;gap:14px;align-items:center;background:var(--teal-soft);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:14px}
 
-/* screens */
-.screen[hidden]{display:none!important}
-.panel{background:var(--paper);border-radius:22px;box-shadow:0 6px 0 var(--sky-deep);padding:clamp(18px,3vw,32px)}
+@media (max-width:520px){.brand{align-items:flex-start}.brand .avatar{width:56px;height:70px}}
+header p{margin:6px 0 0;color:var(--ink-soft);max-width:60ch}
+.reg{font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--paper)}
 
-/* start screen */
-.start{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:start}
-.hero h2{font-size:clamp(30px,5vw,52px);color:var(--forest);font-weight:700}
-.hero p{color:var(--ink-soft);max-width:46ch;margin:12px 0 0}
-.hero .scene{margin-top:18px;border-radius:18px;overflow:hidden;background:var(--sky-deep)}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;background:var(--paper);border:1px solid var(--line);padding:5px;border-radius:16px;margin-bottom:18px;max-width:560px}
+.tabs button{border:0;background:transparent;border-radius:12px;padding:10px 12px;font-weight:700;color:var(--ink-soft);cursor:pointer;line-height:1.25;font-size:15px}
+.tabs button small{display:block;font-weight:500;font-size:12px}
+.tabs button[aria-selected="true"]{background:var(--teal);color:#fff}
+:root[data-theme="dark"] .tabs button[aria-selected="true"]{color:#0D1A1A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tabs button[aria-selected="true"]{color:#0D1A1A}}
+.warn{background:var(--amber-soft);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:14px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,2.6vw,28px)}
+.form{display:flex;flex-direction:column;gap:18px}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;background:var(--bg);padding:5px;border-radius:14px}
+.seg button{border:0;background:transparent;border-radius:10px;padding:10px 8px;font-weight:600;color:var(--ink-soft);cursor:pointer;line-height:1.3}
+.seg button small{display:block;font-weight:500;font-size:12px}
+.seg.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:520px){.seg.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--teal);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .field{display:flex;flex-direction:column;gap:6px}
-.field label,.legend{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
-.field input{border:2px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;background:#fff;color:var(--ink)}
-.form{display:flex;flex-direction:column;gap:20px}
-.topics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.topic{text-align:left;border:2px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;color:var(--ink);display:flex;flex-direction:column;gap:2px;min-height:76px}
-.topic b{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--forest)}
-.topic span{font-size:13px;color:var(--ink-soft)}
-.topic[aria-pressed="true"]{border-color:var(--forest-2);background:#EEF7F0;box-shadow:inset 0 0 0 1px var(--forest-2)}
-.topic.all{grid-column:1/-1;min-height:0}
-.levels{display:flex;gap:8px;flex-wrap:wrap}
-.level{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;color:var(--ink);font-weight:500}
-.level[aria-pressed="true"]{background:var(--forest);border-color:var(--forest);color:#fff}
-.go{background:var(--earth);color:#fff;border:0;border-radius:16px;padding:16px 22px;font-family:var(--font-display);font-size:22px;font-weight:600;box-shadow:0 5px 0 #9A5F18;transition:transform .08s}
-.go:active{transform:translateY(3px);box-shadow:0 2px 0 #9A5F18}
-.best{font-size:14px;color:var(--ink-soft)}
-
-/* game screen */
-.game{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:20px;align-items:start}
-.trail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);padding:14px}
-#trailScene svg{display:block;width:100%;height:auto;border-radius:14px}
-.hero .scene svg{display:block;width:100%;height:auto}
-.stats{display:flex;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap}
-.stat{display:flex;flex-direction:column}
-.stat .k{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft)}
-.stat .v{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--forest);font-variant-numeric:tabular-nums}
-.leaves{display:flex;gap:4px;align-items:center;height:30px}
-.leaves .leaf{width:24px;height:24px;flex:none}
-.leaf.lost{opacity:.18;filter:grayscale(1)}
-
-.card{display:flex;flex-direction:column;gap:16px}
-.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.chip{background:var(--earth-soft);color:#7A4A10;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
-.qnum{font-size:14px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
-.timer{height:10px;background:var(--line);border-radius:999px;overflow:hidden}
-.timer i{display:block;height:100%;width:100%;background:var(--moss);transform-origin:left;transition:background .3s}
-.timer.low i{background:var(--bad)}
-.question{font-family:var(--font-display);font-size:clamp(22px,3.2vw,32px);font-weight:500;color:var(--ink);min-height:2.4em}
-.story{font-family:var(--font-body);font-size:clamp(16px,2vw,19px);font-weight:400;line-height:1.55}
-.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 .12em;font-variant-numeric:tabular-nums}
-.frac .n{padding:0 .15em .08em;border-bottom:.08em solid currentColor}
-.frac .d{padding:.08em .15em 0}
-.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.ans{border:2px solid var(--line);background:#fff;border-radius:16px;padding:16px 12px;font-family:var(--font-display);font-size:clamp(20px,2.6vw,26px);font-weight:500;color:var(--ink);display:flex;align-items:center;gap:12px;min-height:72px;text-align:left;box-shadow:0 4px 0 var(--line);transition:transform .08s,border-color .15s}
-.ans:hover:not(:disabled){border-color:var(--forest-2)}
-.ans:active:not(:disabled){transform:translateY(2px)}
-.ans .key{flex:none;width:28px;height:28px;border-radius:8px;background:var(--sky);color:var(--ink-soft);font-family:var(--font-body);font-size:14px;font-weight:600;display:grid;place-items:center}
-.ans.right{border-color:var(--good);background:#E8F6EC;box-shadow:0 4px 0 #A9D8B6}
-.ans.wrong{border-color:var(--bad);background:#FBEAE6;box-shadow:0 4px 0 #EBB9AE}
-.ans:disabled{cursor:default}
-.feedback{border-radius:14px;padding:14px 16px;background:var(--sky);display:flex;flex-direction:column;gap:6px}
-.feedback.ok{background:#E8F6EC}
-.feedback.no{background:#FBEAE6}
-.feedback h3{font-size:20px}
-.feedback.ok h3{color:var(--good)}
-.feedback.no h3{color:var(--bad)}
-.feedback p{margin:0}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.next{background:var(--forest);color:#fff;border:0;border-radius:14px;padding:12px 20px;font-family:var(--font-display);font-size:19px;font-weight:600;box-shadow:0 4px 0 #123B28}
-.hint{background:transparent;border:2px dashed var(--earth);color:#8A5414;border-radius:12px;padding:8px 14px;font-weight:500}
-.hintbox{background:var(--earth-soft);border-radius:12px;padding:10px 14px;font-size:15px}
+.field label{font-size:13px;font-weight:600}
+.field .hint{font-size:12px;color:var(--ink-soft)}
+.field .hint.err{color:var(--bad);font-weight:600}
+.field input,.field select{border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:11px 13px;width:100%}
+.field input.invalid{border-color:var(--bad)}
+.money{position:relative}
+.money span{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-weight:600}
+.money input{padding-left:42px;font-family:var(--mono);font-size:17px}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+details{border-top:1px dashed var(--line);padding-top:12px}
+summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--teal)}
+details .field{margin-top:12px}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.primary{background:var(--teal);color:#fff;border:0;border-radius:12px;padding:13px 20px;font-weight:700;cursor:pointer}
+:root[data-theme="dark"] .primary{color:#0D1A1A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .primary{color:#0D1A1A}}
+.ghost{background:transparent;border:1.5px solid var(--line);border-radius:12px;padding:12px 16px;font-weight:600;cursor:pointer}
+.ghost:hover{border-color:var(--teal)}
+.privacy{font-size:12px;color:var(--ink-soft);background:var(--teal-soft);border-radius:10px;padding:10px 12px}
 
 /* result */
-.result{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
-.result h2{font-size:clamp(28px,4.4vw,44px);color:var(--forest)}
-.stars{display:flex;gap:8px;margin:14px 0}
-.stars svg{width:52px;height:52px}
-.big{font-family:var(--font-display);font-size:64px;font-weight:700;color:var(--earth);line-height:1;font-variant-numeric:tabular-nums}
-.recap{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:460px;overflow:auto}
-.recap li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);font-size:14px}
-.recap .mark{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
-.recap .mark.y{background:var(--good)}
-.recap .mark.n{background:var(--bad)}
-.recap .q{font-weight:500}
-.recap .a{color:var(--ink-soft)}
+.slip{display:flex;flex-direction:column;gap:18px}
+.who{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px}
+.who b{font-size:18px}
+.who .meta{font-size:13px;color:var(--ink-soft)}
+.badge{align-self:flex-start;background:var(--amber-soft);color:var(--amber);font-weight:700;font-size:12px;border-radius:999px;padding:4px 10px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{background:var(--bg);border-radius:12px;padding:12px}
+.kpi .k{font-size:12px;color:var(--ink-soft);font-weight:600}
+.kpi .v{font-family:var(--mono);font-size:clamp(15px,1.55vw,18px);font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpi.main{background:var(--teal);color:#fff}
+.kpi.main .k{color:rgba(255,255,255,.8)}
+:root[data-theme="dark"] .kpi.main{color:#0D1A1A}
+:root[data-theme="dark"] .kpi.main .k{color:rgba(13,26,26,.75)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kpi.main{color:#0D1A1A} :root:not([data-theme="light"]) .kpi.main .k{color:rgba(13,26,26,.75)}}
+h3{font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.steps{width:100%;border-collapse:collapse;font-size:14px}
+.steps td{padding:7px 0;border-bottom:1px dotted var(--line);vertical-align:top}
+.steps td:last-child{text-align:right;font-family:var(--mono);white-space:nowrap;padding-left:12px}
+.steps tr.total td{font-weight:700;border-bottom:2px solid var(--ink)}
+.steps tr.sub td{color:var(--ink-soft)}
+.months{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.m{border:1px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center}
+.m .k{font-size:11px;color:var(--ink-soft);font-weight:600}
+.m .v{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.m.des{border-color:var(--amber);background:var(--amber-soft)}
 .note{font-size:13px;color:var(--ink-soft);margin:0}
-.preview{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.bubble{background:#E7F7DC;border:1px solid #CDE8B9;border-radius:4px 14px 14px 14px;padding:12px 14px;font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;color:var(--ink)}
-.bubble b{font-weight:600}
-.note.err{color:var(--bad);font-weight:500}
-.req{color:var(--bad);text-transform:none;letter-spacing:0;font-weight:600}
-.field input.invalid{border-color:var(--bad);background:#FFF6F4}
-.share{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 18px}
-.share .note{flex-basis:100%}
-.wa{display:inline-flex;align-items:center;gap:8px;background:#1D8A4E;color:#fff;text-decoration:none;border-radius:14px;padding:12px 18px;font-weight:600;box-shadow:0 4px 0 #136437}
-.wa:hover{background:#18784A}
-.foot{margin-top:10px;font-size:13px;color:var(--ink-soft)}
-.credit{margin-top:24px;padding:14px 18px;border-radius:16px;background:var(--forest);color:#EAF4EE;font-size:14px;display:flex;flex-direction:column;gap:2px}
-.credit b{color:#fff}
-.byline{display:inline-block;margin-top:14px;background:var(--earth-soft);color:#7A4A10;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.callout{border-radius:12px;padding:12px 14px;font-size:14px}
+.callout.refund{background:#E5F3EA;color:#1F5C38}
+:root[data-theme="dark"] .callout.refund{background:#17301F;color:#9EDDB4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .callout.refund{background:#17301F;color:#9EDDB4}}
+.empty{color:var(--ink-soft);text-align:center;padding:40px 10px}
 
-@media (max-width:820px){
-  .start,.game,.result{grid-template-columns:minmax(0,1fr)}
-  .trail{position:static;padding:10px}
-  #trailScene svg{max-height:22vh;width:auto;max-width:100%;margin:0 auto}
-  .stats{margin-top:6px}
-  .stat .v{font-size:20px}
-  .game{gap:12px}
-}
-@media (max-width:460px){
-  .answers{grid-template-columns:minmax(0,1fr);gap:8px}
-  .ans{min-height:54px;padding:10px 12px;gap:10px;font-size:20px}
-  .question{min-height:0}
-  .story{font-size:16px;line-height:1.45}
-  .card{gap:12px}
-  .top{margin-bottom:12px}
-  .topics{grid-template-columns:minmax(0,1fr)}
-}
-@media (prefers-reduced-motion:reduce){
-  *{transition:none!important;animation:none!important}
-}
-.pop{animation:pop .35s ease-out}
-@keyframes pop{0%{transform:scale(.96)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
-.shake{animation:shake .35s}
-@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+/* roster */
+.roster{margin-top:20px}
+.tablewrap{overflow-x:auto}
+table.list{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+table.list th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);text-align:left;padding:8px;border-bottom:2px solid var(--line)}
+table.list td{padding:9px 8px;border-bottom:1px solid var(--line)}
+table.list td.r,table.list th.r{text-align:right;font-family:var(--mono)}
+table.list tfoot td{font-weight:700;border-bottom:0}
+.x{background:none;border:0;color:var(--bad);cursor:pointer;font-weight:700;padding:4px 8px}
+footer{margin-top:28px;font-size:12px;color:var(--ink-soft);display:flex;flex-direction:column;gap:4px}
+footer a{color:var(--teal)}
+
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.kpis{grid-template-columns:minmax(0,1fr)}.months{grid-template-columns:repeat(3,minmax(0,1fr))}.row2{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -176,703 +142,843 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="21" fill="#1F5B3F"/><path d="M7 32 L18 15 L24 24 L28 19 L37 32 Z" fill="#7FB069"/><circle cx="31" cy="12" r="4" fill="#C9822B"/></svg>
-      <h1>Math with Yendi<small>Jelajah Gunung Matematika · Kelas 5 SD</small></h1>
+      <img class="avatar" src="data:image/jpeg;base64,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" width="72" height="90" alt="Foto Pak Yendi">
+      <div>
+      <div class="eyebrow" id="hEyebrow">Kalkulator PPh 21 · Tahun pajak 2026</div>
+      <h1><span id="hTitle">Hitung PPh 21</span> <span class="with">bersama Pak Yendi</span></h1>
+      <div class="byline">Disusun oleh Yendi Septiyendi, CTT · Certified Tax Technician (Brevet A&amp;B, ATPI)</div>
+      <p id="hLead">Isi nama, NIK, status, dan gaji kotor bulanan. Potongan pajak per bulan, hitungan Desember, dan gaji bersih langsung muncul.</p>
+      </div>
     </div>
-    <button class="iconbtn" id="soundBtn" type="button" aria-pressed="true">Suara: Nyala</button>
+    <span class="reg" id="hReg">Dasar: PP 58/2023 · PMK 168/2023 · PMK 81/2024 · UU HPP</span>
   </header>
 
-  <!-- START -->
-  <section class="screen" id="startScreen">
-    <div class="start">
-      <div class="panel hero">
-        <h2>Daki gunung dengan menjawab soal.</h2>
-        <span class="byline">Bersama Pak Yendi</span>
-        <p>Setiap jawaban benar membawamu naik satu pos. Jawab 10 soal untuk sampai di puncak. Kamu punya 3 daun nyawa, jadi hati-hati.</p>
-        <div class="scene" id="heroScene"></div>
+  <nav class="tabs" role="tablist" aria-label="Jenis pajak">
+    <button type="button" role="tab" id="tabBtn21" aria-selected="true" aria-controls="tab21">PPh 21<small>karyawan & honor</small></button>
+    <button type="button" role="tab" id="tabBtnB" aria-selected="false" aria-controls="tabBadan">PPh Badan<small>perusahaan, koperasi, yayasan</small></button>
+  </nav>
+
+  <div id="tab21" role="tabpanel">
+  <div class="grid">
+    <form class="card form" id="f" novalidate autocomplete="off">
+      <div class="seg" role="group" aria-label="Jenis penerima penghasilan">
+        <button type="button" data-mode="pegawai" aria-pressed="true">Karyawan tetap<small>dipotong perusahaan/badan</small></button>
+        <button type="button" data-mode="bukan" aria-pressed="false">Perorangan bukan pegawai<small>honor, jasa, freelance</small></button>
       </div>
-      <form class="panel form" id="setupForm" autocomplete="off" novalidate>
+
+      <div class="field">
+        <label for="nama">Nama lengkap</label>
+        <input id="nama" maxlength="60" placeholder="Contoh: Siti Aminah">
+        <span class="hint" id="namaHint">Sesuai KTP.</span>
+      </div>
+      <div class="field">
+        <label for="nik">NIK (16 digit)</label>
+        <input id="nik" class="num" inputmode="numeric" maxlength="19" placeholder="3276 0123 4567 0001">
+        <span class="hint" id="nikHint">Sejak 2024 NIK berfungsi sebagai NPWP.</span>
+      </div>
+      <div class="field" id="statusField">
+        <label for="status">Status PTKP</label>
+        <select id="status">
+          <option value="TK/0">TK/0 · Belum kawin, tanpa tanggungan</option>
+          <option value="TK/1">TK/1 · Belum kawin, 1 tanggungan</option>
+          <option value="TK/2">TK/2 · Belum kawin, 2 tanggungan</option>
+          <option value="TK/3">TK/3 · Belum kawin, 3 tanggungan</option>
+          <option value="K/0">K/0 · Kawin, tanpa tanggungan</option>
+          <option value="K/1">K/1 · Kawin, 1 tanggungan</option>
+          <option value="K/2">K/2 · Kawin, 2 tanggungan</option>
+          <option value="K/3">K/3 · Kawin, 3 tanggungan</option>
+        </select>
+        <span class="hint">Menentukan kategori TER dan PTKP. Tanggungan maksimal 3 orang.</span>
+      </div>
+      <div class="field">
+        <label for="gaji" id="gajiLabel">Gaji kotor per bulan</label>
+        <div class="money"><span>Rp</span><input id="gaji" inputmode="numeric" placeholder="10.000.000"></div>
+        <span class="hint" id="gajiHint">Gaji pokok + semua tunjangan, sebelum dipotong apa pun.</span>
+      </div>
+
+      <details id="extra">
+        <summary>Rincian tambahan (opsional)</summary>
         <div class="field">
-          <label for="playerName">Nama penjelajah <span class="req">*wajib</span></label>
-          <input id="playerName" maxlength="20" placeholder="Contoh: Ayesha" value="" required aria-describedby="nameNote">
-          <span class="note" id="nameNote">Tulis nama lengkap atau nama panggilan.</span>
+          <label for="iuran">Iuran JHT + Jaminan Pensiun yang dipotong dari gaji, per bulan</label>
+          <div class="money"><span>Rp</span><input id="iuran" inputmode="numeric" placeholder="0"></div>
+          <span class="hint">Biasanya 2% (JHT) + 1% (JP) dari gaji. Mengurangi pajak di hitungan Desember.</span>
         </div>
         <div class="field">
-          <label for="parentPhone">No. WhatsApp orang tua <span class="req">*wajib</span></label>
-          <input id="parentPhone" type="tel" inputmode="tel" maxlength="16" placeholder="Contoh: 0812 3456 7890" value="" required aria-describedby="phoneNote">
-          <span class="note" id="phoneNote">Hasil latihan bisa dikirim ke nomor ini setelah selesai bermain.</span>
+          <label for="zakat">Zakat lewat pemberi kerja, per bulan</label>
+          <div class="money"><span>Rp</span><input id="zakat" inputmode="numeric" placeholder="0"></div>
+          <span class="hint">Hanya zakat ke BAZNAS/LAZ resmi yang dipotong oleh pemberi kerja.</span>
         </div>
-        <div>
-          <div class="legend" id="topicLegend">Pilih jalur</div>
-          <div class="topics" role="group" aria-labelledby="topicLegend" id="topicList"></div>
-        </div>
-        <div>
-          <div class="legend" id="levelLegend">Tingkat kesulitan</div>
-          <div class="levels" role="group" aria-labelledby="levelLegend" id="levelList"></div>
-        </div>
-        <button class="go" type="submit">Mulai mendaki</button>
-        <div class="best" id="bestLine"></div>
-      </form>
+      </details>
+
+      <div class="btns">
+        <button class="primary" type="submit">Hitung pajak</button>
+        <button class="ghost" type="button" id="contoh">Isi contoh</button>
+      </div>
+      <p class="privacy">Data hanya dihitung di perangkat ini. Nama dan NIK tidak dikirim atau disimpan ke mana pun.</p>
+    </form>
+
+    <section class="card" aria-live="polite">
+      <div id="empty" class="empty">
+        <p><b>Hasil hitungan akan muncul di sini.</b></p>
+        <p class="note">Tekan "Isi contoh" untuk melihat contoh gaji Rp10.000.000 dengan status TK/0.</p>
+      </div>
+      <div id="out" class="slip" hidden></div>
+    </section>
+  </div>
+
+  <section class="card roster" id="rosterCard" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <h2 style="font-size:20px">Daftar perhitungan</h2>
+      <div class="btns"><button class="ghost" type="button" id="pdfAll">Unduh daftar PDF</button><button class="ghost" type="button" id="copyAll">Salin daftar</button><button class="ghost" type="button" id="clearAll">Kosongkan</button></div>
+    </div>
+    <p class="note" style="margin-bottom:10px">Untuk perusahaan atau bendahara: tambahkan beberapa orang untuk melihat total PPh 21 yang dipotong per bulan. Daftar hilang saat halaman ditutup.</p>
+    <div class="tablewrap">
+      <table class="list">
+        <thead><tr><th>Nama</th><th>NIK</th><th>Jenis</th><th>Status</th><th class="r">Bruto/bulan</th><th class="r">PPh 21 Jan–Nov</th><th class="r">PPh 21 Des</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+        <tfoot><tr><td colspan="4">Total</td><td class="r" id="tBruto"></td><td class="r" id="tTer"></td><td class="r" id="tDes"></td><td></td></tr></tfoot>
+      </table>
     </div>
   </section>
 
-  <!-- GAME -->
-  <section class="screen" id="gameScreen" hidden>
-    <div class="game">
-      <aside class="panel trail">
-        <div id="trailScene"></div>
-        <div class="stats">
-          <div class="stat"><span class="k">Skor</span><span class="v" id="score">0</span></div>
-          <div class="stat"><span class="k">Pos</span><span class="v" id="pos">0/10</span></div>
-          <div class="stat"><span class="k">Nyawa</span><span class="leaves" id="lives"></span></div>
-        </div>
-      </aside>
-      <div class="panel card" id="card">
-        <div class="qhead">
-          <span class="chip" id="qTopic">Pecahan</span>
-          <span class="qnum" id="qNum">Soal 1 dari 10</span>
-        </div>
-        <div class="timer" id="timer" aria-hidden="true"><i id="timerBar"></i></div>
-        <div class="question" id="question" aria-live="polite"></div>
-        <div class="answers" id="answers"></div>
-        <div class="row">
-          <button class="hint" type="button" id="hintBtn">Petunjuk (−5 poin)</button>
-          <span class="qnum" id="timeLeft"></span>
-        </div>
-        <div class="hintbox" id="hintBox" hidden></div>
-        <div class="feedback" id="feedback" hidden>
-          <h3 id="fbTitle"></h3>
-          <p id="fbText"></p>
-          <div class="row"><button class="next" type="button" id="nextBtn">Lanjut</button></div>
-        </div>
-      </div>
-    </div>
-  </section>
+  </div>
 
-  <!-- RESULT -->
-  <section class="screen" id="resultScreen" hidden>
-    <div class="result">
-      <div class="panel">
-        <h2 id="resTitle">Sampai di puncak!</h2>
-        <div class="stars" id="stars"></div>
-        <div class="big" id="resScore">0</div>
-        <p id="resText"></p>
-        <div class="preview">
-          <div class="legend">Pratinjau pesan untuk orang tua</div>
-          <div class="bubble" id="msgPreview"></div>
-        </div>
-        <div class="share">
-          <a class="wa" id="waLink" href="https://wa.me/" target="_blank" rel="noopener">
-            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.6 7.6c.3-.6.6-.6.9-.6h.6c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.5.7c-.1.2-.2.3 0 .6.6 1 1.4 1.8 2.4 2.4.3.2.4.1.6 0l.7-.8c.2-.2.3-.2.6-.1l1.8.9c.3.1.4.2.4.4 0 .5-.2 1.4-1.2 1.8-.8.3-1.9.4-4-.7-2.1-1.1-3.5-3.2-3.8-3.8-.4-.6-.9-1.8-.3-3.2Z" fill="currentColor"/></svg>
-            <span id="waLabel">Kirim hasil ke WhatsApp orang tua</span>
-          </a>
-          <button class="iconbtn" type="button" id="copyBtn">Salin pesan</button>
-          <p class="note" id="waNote"></p>
-        </div>
-        <div class="row">
-          <button class="go" type="button" id="againBtn">Daki lagi</button>
-          <button class="iconbtn" type="button" id="menuBtn">Ganti jalur</button>
+  <div id="tabBadan" role="tabpanel" hidden>
+  <div class="grid">
+    <form class="card form" id="fb" novalidate autocomplete="off">
+      <div class="field">
+        <label>Bentuk badan</label>
+        <div class="seg g4" id="bGroup" role="group" aria-label="Bentuk badan">
+          <button type="button" data-grp="PER" aria-pressed="true">Perusahaan<small>PT</small></button>
+          <button type="button" data-grp="CV" aria-pressed="false">CV / Firma<small>persekutuan</small></button>
+          <button type="button" data-grp="YYS" aria-pressed="false">Yayasan<small>nirlaba</small></button>
+          <button type="button" data-grp="KOP" aria-pressed="false">Koperasi<small>/ BUMDes</small></button>
         </div>
       </div>
-      <div class="panel">
-        <h3 style="font-size:22px;color:var(--forest);margin-bottom:12px">Pembahasan</h3>
-        <ul class="recap" id="recap"></ul>
+      <div class="field">
+        <label for="bNama" id="bNamaLabel">Nama perusahaan</label>
+        <input id="bNama" maxlength="80" placeholder="Contoh: PT Maju Bersama Nusantara">
+        <span class="hint" id="bNamaHint">Sesuai akta / NPWP.</span>
       </div>
-    </div>
-  </section>
+      <div class="field">
+        <label for="bNpwp">NPWP badan (16 digit)</label>
+        <input id="bNpwp" class="num" inputmode="numeric" maxlength="19" placeholder="0012 3456 7890 1000">
+        <span class="hint" id="bNpwpHint">NPWP 16 digit yang dipakai di Coretax.</span>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="bJenis" id="bJenisLabel">Jenis perusahaan</label>
+          <select id="bJenis"></select>
+        </div>
+        <div class="field">
+          <label for="bTahun">Tahun terdaftar NPWP</label>
+          <input id="bTahun" class="num" inputmode="numeric" maxlength="4" placeholder="2022">
+        </div>
+      </div>
+      <div class="field">
+        <label for="bOmzet" id="bOmzetLabel">Peredaran bruto (omzet) setahun 2026</label>
+        <div class="money"><span>Rp</span><input id="bOmzet" inputmode="numeric" placeholder="3.000.000.000"></div>
+        <span class="hint" id="bOmzetHint">Total penerimaan usaha sebelum dikurangi biaya.</span>
+      </div>
+      <div class="field">
+        <label for="bSkema">Skema perhitungan</label>
+        <select id="bSkema">
+          <option value="auto">Otomatis sesuai PP 20/2026</option>
+          <option value="final">PPh final UMKM 0,5% dari omzet</option>
+          <option value="umum">Tarif umum 22% (dengan fasilitas Pasal 31E)</option>
+        </select>
+        <span class="hint" id="bSkemaHint">Pilihan otomatis memakai jenis badan, tahun terdaftar, dan omzet.</span>
+      </div>
+      <div id="bUmum">
+        <div class="field">
+          <label for="bLaba" id="bLabaLabel">Laba sebelum pajak menurut laporan keuangan</label>
+          <div class="money"><span>Rp</span><input id="bLaba" inputmode="numeric" placeholder="400.000.000"></div>
+        </div>
+        <details id="bExtra" style="margin-top:14px">
+          <summary>Koreksi fiskal & kredit pajak (opsional)</summary>
+          <div class="field">
+            <label for="bKorPos">Koreksi fiskal positif (biaya yang tidak boleh dikurangkan)</label>
+            <div class="money"><span>Rp</span><input id="bKorPos" inputmode="numeric" placeholder="0"></div>
+          </div>
+          <div class="field">
+            <label for="bKorNeg">Koreksi fiskal negatif (penghasilan final / bukan objek)</label>
+            <div class="money"><span>Rp</span><input id="bKorNeg" inputmode="numeric" placeholder="0"></div>
+          </div>
+          <div class="field">
+            <label for="bRugi">Kompensasi kerugian tahun sebelumnya</label>
+            <div class="money"><span>Rp</span><input id="bRugi" inputmode="numeric" placeholder="0"></div>
+          </div>
+          <div class="field" id="bHibahField" hidden>
+            <label for="bHibah">Sumbangan, hibah, zakat/infak yang diterima dan sudah termasuk dalam sisa lebih</label>
+            <div class="money"><span>Rp</span><input id="bHibah" inputmode="numeric" placeholder="0"></div>
+            <span class="hint">Bukan objek pajak bila tidak ada hubungan usaha, pekerjaan, atau kepemilikan dengan pemberi (UU PPh Pasal 4 ayat 3 huruf a; PMK 90/2020). Dikurangkan dari sisa lebih.</span>
+          </div>
+          <div class="field" id="bTanamField">
+            <label for="bTanam">Sisa lebih yang ditanam kembali ke sarana-prasarana pendidikan (≤ 4 tahun)</label>
+            <div class="money"><span>Rp</span><input id="bTanam" inputmode="numeric" placeholder="0"></div>
+            <span class="hint">Bukan objek pajak (UU PPh Pasal 4 ayat 3 huruf m; PMK 68/2020) bila benar ditanam kembali dan dilaporkan di lampiran SPT.</span>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="b22">PPh 22 dipungut</label><div class="money"><span>Rp</span><input id="b22" inputmode="numeric" placeholder="0"></div></div>
+            <div class="field"><label for="b23">PPh 23 dipotong</label><div class="money"><span>Rp</span><input id="b23" inputmode="numeric" placeholder="0"></div></div>
+            <div class="field"><label for="b24">PPh 24 (luar negeri)</label><div class="money"><span>Rp</span><input id="b24" inputmode="numeric" placeholder="0"></div></div>
+            <div class="field"><label for="b25">PPh 25 sudah dibayar</label><div class="money"><span>Rp</span><input id="b25" inputmode="numeric" placeholder="0"></div></div>
+          </div>
+        </details>
+      </div>
+      <div class="btns">
+        <button class="primary" type="submit">Hitung PPh Badan</button>
+        <button class="ghost" type="button" id="bContoh">Isi contoh</button>
+      </div>
+      <p class="privacy">Data hanya dihitung di perangkat ini dan tidak dikirim ke mana pun.</p>
+    </form>
 
-  <footer class="credit">
-    <div><b>Math with Yendi</b> dibuat oleh Pak Yendi Septiyendi, S.Kom., Gr. · Guru Informatika & Matematika</div>
-    <div>Instagram <b>@pakyendi.id</b> · Les privat Matematika & konsultasi sekolah alam</div>
+    <section class="card" aria-live="polite">
+      <div id="bEmpty" class="empty">
+        <p><b>Hasil hitungan PPh Badan akan muncul di sini.</b></p>
+        <p class="note">Tekan "Isi contoh" untuk melihat contoh yayasan pendidikan dengan omzet Rp3 miliar.</p>
+      </div>
+      <div id="bOut" class="slip" hidden></div>
+    </section>
+  </div>
+  </div>
+
+  <div class="credit">
+    <img class="avatar" src="data:image/jpeg;base64,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" width="56" height="70" alt="Foto Pak Yendi">
+    <div><b>Hitung Pajak bersama Pak Yendi</b> · Yendi Septiyendi, S.Kom., Gr., CTT<br>Pendampingan lapor SPT Tahunan & administrasi pajak sekolah/UMKM · Instagram <b>@pakyendi.id</b></div>
+  </div>
+  <footer>
+    <span>PPh 21: TER bulanan Lampiran PP 58/2023, tarif Pasal 17 UU HPP, PTKP PMK 101/2016, biaya jabatan 5% (maks. Rp6.000.000 setahun). PPh Badan: tarif 22% Pasal 17 UU HPP, fasilitas Pasal 31E, PPh final UMKM PP 55/2022 jo. PP 20/2026, sisa lebih lembaga pendidikan PMK 68/2020. Batas setor/lapor PMK 81/2024.</span>
+    <span>Hasil adalah perkiraan. PPh 21 diasumsikan untuk penghasilan tetap yang sama setiap bulan selama setahun. Belum memperhitungkan bonus/THR, insentif PPh 21 DTP sektor tertentu, atau pegawai yang masuk/keluar di tengah tahun. Untuk kepastian, konsultasikan dengan konsultan pajak terdaftar.</span>
   </footer>
-  <p class="foot">Soal dibuat acak setiap permainan, jadi bisa dimainkan berkali-kali. Tombol 1–4 pada keyboard bisa dipakai untuk menjawab, Enter untuk lanjut.</p>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
 "use strict";
-/* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
-const rnd = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
-const pick = arr => arr[Math.floor(Math.random()*arr.length)];
-const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a; };
-const lcm = (a,b) => a/gcd(a,b)*b;
-const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
-const fmt = n => { // Indonesian number format, comma decimal
-  const r = Math.round(n*1000)/1000;
-  const s = r.toLocaleString('id-ID',{maximumFractionDigits:3});
-  return s;
+const rp = n => 'Rp' + Math.round(n).toLocaleString('id-ID');
+const rpS = n => (n<0?'−':'') + rp(Math.abs(n));
+const parseRp = s => Number(String(s||'').replace(/[^0-9]/g,'')) || 0;
+const pct = r => (r*100).toLocaleString('id-ID',{maximumFractionDigits:2}) + '%';
+
+/* ---- Rules ---- */
+const PTKP = {'TK/0':54e6,'TK/1':58.5e6,'TK/2':63e6,'TK/3':67.5e6,'K/0':58.5e6,'K/1':63e6,'K/2':67.5e6,'K/3':72e6};
+const CAT = {'TK/0':'A','TK/1':'A','K/0':'A','TK/2':'B','TK/3':'B','K/1':'B','K/2':'B','K/3':'C'};
+// [upper bound inclusive, rate] — Lampiran PP 58/2023
+const TER = {
+ A:[[5.4e6,0],[5.65e6,.0025],[5.95e6,.005],[6.3e6,.0075],[6.75e6,.01],[7.5e6,.0125],[8.55e6,.015],[9.65e6,.0175],[10.05e6,.02],[10.35e6,.0225],[10.7e6,.025],[11.05e6,.03],[11.6e6,.035],[12.5e6,.04],[13.75e6,.05],[15.1e6,.06],[16.95e6,.07],[19.75e6,.08],[24.15e6,.09],[26.45e6,.10],[28e6,.11],[30.05e6,.12],[32.4e6,.13],[35.4e6,.14],[39.1e6,.15],[43.85e6,.16],[47.8e6,.17],[51.4e6,.18],[56.3e6,.19],[62.2e6,.20],[68.6e6,.21],[77.5e6,.22],[89e6,.23],[103e6,.24],[125e6,.25],[157e6,.26],[206e6,.27],[337e6,.28],[454e6,.29],[550e6,.30],[695e6,.31],[910e6,.32],[1.4e9,.33],[Infinity,.34]],
+ B:[[6.2e6,0],[6.5e6,.0025],[6.85e6,.005],[7.3e6,.0075],[9.2e6,.01],[10.75e6,.015],[11.25e6,.02],[11.6e6,.025],[12.6e6,.03],[13.6e6,.04],[14.95e6,.05],[16.4e6,.06],[18.45e6,.07],[21.85e6,.08],[26e6,.09],[27.7e6,.10],[29.35e6,.11],[31.45e6,.12],[33.95e6,.13],[37.1e6,.14],[41.1e6,.15],[45.8e6,.16],[49.5e6,.17],[53.8e6,.18],[58.5e6,.19],[64e6,.20],[71e6,.21],[80e6,.22],[93e6,.23],[109e6,.24],[129e6,.25],[163e6,.26],[211e6,.27],[374e6,.28],[459e6,.29],[555e6,.30],[704e6,.31],[957e6,.32],[1.405e9,.33],[Infinity,.34]],
+ C:[[6.6e6,0],[6.95e6,.0025],[7.35e6,.005],[7.8e6,.0075],[8.85e6,.01],[9.8e6,.0125],[10.95e6,.015],[11.2e6,.0175],[12.05e6,.02],[12.95e6,.03],[14.15e6,.04],[15.55e6,.05],[17.05e6,.06],[19.5e6,.07],[22.7e6,.08],[26.6e6,.09],[28.1e6,.10],[30.1e6,.11],[32.6e6,.12],[35.4e6,.13],[38.9e6,.14],[43e6,.15],[47.4e6,.16],[51.2e6,.17],[55.8e6,.18],[60.4e6,.19],[66.7e6,.20],[74.5e6,.21],[83.2e6,.22],[95.6e6,.23],[110e6,.24],[134e6,.25],[169e6,.26],[221e6,.27],[390e6,.28],[463e6,.29],[561e6,.30],[709e6,.31],[965e6,.32],[1.419e9,.33],[Infinity,.34]]
 };
-// fraction object {n,d} simplified, d>0
-const F = (n,d) => { const g=gcd(n,d)||1; return {n:n/g,d:d/g}; };
-const fval = f => f.n/f.d;
-const fhtml = (f) => {
-  if (f.d===1) return String(f.n);
-  const whole = Math.trunc(f.n/f.d), rem = f.n % f.d;
-  if (whole>0 && rem>0) return `${whole}<span class="frac"><span class="n">${rem}</span><span class="d">${f.d}</span></span>`;
-  return `<span class="frac"><span class="n">${f.n}</span><span class="d">${f.d}</span></span>`;
-};
-const ftext = f => {
-  if (f.d===1) return String(f.n);
-  const whole = Math.trunc(f.n/f.d), rem = f.n % f.d;
-  if (whole>0 && rem>0) return `${whole} ${rem}/${f.d}`;
-  return `${f.n}/${f.d}`;
-};
-const fr = (n,d) => fhtml({n,d}); // unsimplified display
-
-/* Build options: correct + distractors (unique by value key). */
-function options(correct, distractors, keyFn, showFn){
-  const seen = new Set([keyFn(correct)]);
-  const out = [{v:correct, ok:true}];
-  for (const d of distractors){
-    if (out.length>=4) break;
-    if (d===null||d===undefined) continue;
-    const k = keyFn(d);
-    if (k===null || seen.has(k)) continue;
-    seen.add(k); out.push({v:d, ok:false});
-  }
-  return shuffle(out).map(o => ({html: showFn(o.v), ok:o.ok}));
+const P17 = [[60e6,.05],[250e6,.15],[500e6,.25],[5e9,.30],[Infinity,.35]];
+function terRate(cat, bruto){ for (const [up,r] of TER[cat]) if (bruto<=up) return r; return .34; }
+function pasal17(pkp){
+  let left=pkp, prev=0, tax=0; const layers=[];
+  for (const [up,r] of P17){ if (left<=0) break; const span=Math.min(left, up-prev); tax+=span*r; layers.push({span,r,tax:span*r}); left-=span; prev=up; }
+  return {tax, layers};
 }
-function numOptions(correct, extra, unit=''){
-  const cands = [...extra];
-  // fallback nearby values
-  let step = Math.max(1, Math.round(Math.abs(correct)*0.1));
-  for (let i=1; cands.length<12; i++){ cands.push(correct+step*i, correct-step*i); }
-  return options(correct, cands.filter(x=>x>0), x=>String(Math.round(x*1000)/1000), x=>fmt(x)+(unit?` ${unit}`:''));
+function calcPegawai(status, gaji, iuran, zakat){
+  const cat = CAT[status], rate = terRate(cat, gaji);
+  const terBulan = Math.floor(gaji*rate);
+  const bruto = gaji*12;
+  const bj = Math.min(bruto*0.05, 6e6);
+  const iuranTh = iuran*12, zakatTh = zakat*12;
+  const neto = bruto - bj - iuranTh - zakatTh;
+  const ptkp = PTKP[status];
+  const pkp = Math.max(0, Math.floor((neto-ptkp)/1000)*1000);
+  const p = pasal17(pkp);
+  const setahun = Math.floor(p.tax);
+  const des = setahun - terBulan*11;
+  return {cat, rate, terBulan, bruto, bj, iuranTh, zakatTh, neto, ptkp, pkp, layers:p.layers, setahun, des,
+          thpBulan: gaji - terBulan - iuran - zakat, thpDes: gaji - Math.max(0,des) - iuran - zakat};
 }
-function fracOptions(correct, extra){
-  const cands = extra.filter(f=>f && f.d>0 && f.n>0).map(f=>F(f.n,f.d));
-  // nearby fallbacks
-  for (let i=1; cands.length<12; i++){ cands.push(F(correct.n+i, correct.d)); if (correct.n-i>0) cands.push(F(correct.n-i, correct.d)); cands.push(F(correct.n, correct.d+i)); }
-  return options(correct, cands, f=>`${f.n}/${f.d}`, fhtml);
+function calcBukan(gaji){
+  const dpp = gaji*0.5;
+  const p = pasal17(dpp);
+  const tax = Math.floor(p.tax);
+  return {dpp, layers:p.layers, tax, eff: gaji? tax/gaji : 0, net: gaji - tax};
 }
 
-/* ---------- question banks ---------- */
-const LV = {mudah:0, sedang:1, sulit:2};
+/* ---- UI ---- */
+let mode = 'pegawai';
+document.querySelectorAll('.seg button[data-mode]').forEach(b=>b.addEventListener('click',()=>{
+  mode = b.dataset.mode;
+  document.querySelectorAll('.seg button[data-mode]').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  $('statusField').hidden = mode!=='pegawai';
+  $('extra').hidden = mode!=='pegawai';
+  $('gajiLabel').textContent = mode==='pegawai' ? 'Gaji kotor per bulan' : 'Honor / imbalan bruto per pembayaran';
+  $('gajiHint').textContent = mode==='pegawai' ? 'Gaji pokok + semua tunjangan, sebelum dipotong apa pun.' : 'Jumlah kotor yang dibayarkan dalam satu kali pembayaran.';
+  if (!$('out').hidden) run(false);
+}));
+const fmtMoney = el => el.addEventListener('input',()=>{ const n=parseRp(el.value); el.value = n? n.toLocaleString('id-ID') : ''; });
+['gaji','iuran','zakat'].forEach(id=>fmtMoney($(id)));
+$('nik').addEventListener('input',()=>{ const d=$('nik').value.replace(/\D/g,'').slice(0,16); $('nik').value = d.replace(/(\d{4})(?=\d)/g,'$1 '); });
+const maskNik = n => n.slice(0,4)+' •••• •••• '+n.slice(12);
 
-const TOPICS = [
- {id:'pecahan', name:'Pecahan', desc:'Jumlah, kurang, kali pecahan', gen:genPecahan},
- {id:'desimal', name:'Desimal & Persen', desc:'Ubah bentuk, persen dari bilangan', gen:genDesimal},
- {id:'kpk', name:'KPK & FPB', desc:'Kelipatan dan faktor, soal cerita', gen:genKPK},
- {id:'volume', name:'Volume Bangun Ruang', desc:'Kubus, balok, liter', gen:genVolume},
- {id:'kecepatan', name:'Kecepatan & Debit', desc:'Jarak, waktu, kecepatan, debit', gen:genKecepatan},
-];
-
-function genPecahan(lv){
-  const maxD = [6,10,12][lv];
-  const type = pick(lv===0 ? ['add','add','sub'] : ['add','sub','mul', lv===2?'mixed':'add']);
-  let b = rnd(2,maxD), d = rnd(2,maxD);
-  while (d===b && lv>0) d = rnd(2,maxD);
-  let a = rnd(1,b-1), c = rnd(1,d-1);
-  if (type==='add'){
-    const ans = F(a*d+c*b, b*d);
-    const L = lcm(b,d);
-    return {
-      q:`${fr(a,b)} + ${fr(c,d)} = ...`,
-      opts: fracOptions(ans,[F(a+c,b+d), {n:a+c,d:Math.max(b,d)}, F(a*c,b*d), F(a*d+c*b+L/ (L/1) ,b*d)]),
-      hint:`Samakan penyebutnya dulu. KPK dari ${b} dan ${d} adalah ${L}.`,
-      exp:`Ubah ke penyebut ${L}: ${a*(L/b)}/${L} + ${c*(L/d)}/${L} = ${a*(L/b)+c*(L/d)}/${L} = ${ftext(ans)}.`,
-      plain:`${a}/${b} + ${c}/${d}`, ansText: ftext(ans)
-    };
-  }
-  if (type==='sub'){
-    if (a/b < c/d){ [a,b,c,d]=[c,d,a,b]; }
-    if (a*d===c*b){ a = Math.min(b-1,a+1); if (a*d<=c*b){ a=b-1; c=1; d = d<2?2:d; } }
-    if (a*d<=c*b) { a=b-1; c=1; d=b+1; }
-    const ans = F(a*d-c*b, b*d);
-    const L = lcm(b,d);
-    return {
-      q:`${fr(a,b)} − ${fr(c,d)} = ...`,
-      opts: fracOptions(ans,[Math.abs(a-c)>0 && b!==d ? F(Math.abs(a-c),Math.abs(b-d)||1):null, F(a*d+c*b,b*d), {n:Math.abs(a-c)||1,d:Math.max(b,d)}]),
-      hint:`Samakan penyebutnya dulu. KPK dari ${b} dan ${d} adalah ${L}.`,
-      exp:`Ubah ke penyebut ${L}: ${a*(L/b)}/${L} − ${c*(L/d)}/${L} = ${a*(L/b)-c*(L/d)}/${L} = ${ftext(ans)}.`,
-      plain:`${a}/${b} − ${c}/${d}`, ansText: ftext(ans)
-    };
-  }
-  if (type==='mul'){
-    const ans = F(a*c, b*d);
-    return {
-      q:`${fr(a,b)} × ${fr(c,d)} = ...`,
-      opts: fracOptions(ans,[F(a*d+c*b,b*d), F(a*d,b*c), F(a+c,b+d)]),
-      hint:`Kalikan pembilang dengan pembilang, penyebut dengan penyebut.`,
-      exp:`(${a}×${c})/(${b}×${d}) = ${a*c}/${b*d} = ${ftext(ans)}.`,
-      plain:`${a}/${b} × ${c}/${d}`, ansText: ftext(ans)
-    };
-  }
-  // mixed: whole number times fraction story
-  const n = rnd(2,6)*b;
-  const ans = n/b*a;
-  const item = pick(['kelereng','buku','bibit pohon','kue']);
-  return {
-    q:`<span class="story">Bu Rina punya ${n} ${item}. Sebanyak ${fr(a,b)} bagian dibagikan ke murid. Berapa ${item} yang dibagikan?</span>`,
-    opts: numOptions(ans,[n/b, n-ans, n*a, ans+a]),
-    hint:`Hitung ${a}/${b} × ${n}. Bagi dulu ${n} dengan ${b}, lalu kalikan ${a}.`,
-    exp:`${n} : ${b} = ${n/b}, lalu ${n/b} × ${a} = ${ans} ${item}.`,
-    plain:`${a}/${b} dari ${n} ${item}`, ansText:`${ans}`
-  };
+function validate(){
+  const nama=$('nama').value.trim(), nik=$('nik').value.replace(/\D/g,''), gaji=parseRp($('gaji').value);
+  let ok=true;
+  const set=(el,hint,bad,msg,def)=>{ el.classList.toggle('invalid',bad); hint.classList.toggle('err',bad); hint.textContent = bad?msg:def; if(bad&&ok){el.focus(); ok=false;} };
+  set($('nama'),$('namaHint'),!nama,'Nama wajib diisi.','Sesuai KTP.');
+  set($('nik'),$('nikHint'),nik.length!==16,'NIK harus 16 digit angka.','Sejak 2024 NIK berfungsi sebagai NPWP.');
+  set($('gaji'),$('gajiHint'),gaji<=0,'Isi jumlah gaji/honor terlebih dahulu.', mode==='pegawai'?'Gaji pokok + semua tunjangan, sebelum dipotong apa pun.':'Jumlah kotor yang dibayarkan dalam satu kali pembayaran.');
+  return ok ? {nama,nik,gaji} : null;
 }
 
-function genDesimal(lv){
-  const type = pick(lv===0 ? ['f2p','pOf','d2f'] : ['f2p','pOf','d2f','dadd', lv===2?'diskon':'pOf']);
-  if (type==='f2p'){
-    const pairs = [[1,2],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5],[1,10],[3,10],[7,10],[1,20],[3,20],[9,20],[1,25],[6,25],[1,50],[7,50]];
-    const [a,b] = pick(lv===0?pairs.slice(0,9):pairs);
-    const ans = a/b*100;
-    return {
-      q:`${fr(a,b)} = ... %`,
-      opts: numOptions(ans,[a*10, b, ans/10, 100-ans, a*b],'%'),
-      hint:`Ubah penyebut menjadi 100, atau kalikan pecahan dengan 100%.`,
-      exp:`${a}/${b} × 100% = ${fmt(ans)}%.`, plain:`${a}/${b} = ...%`, ansText:`${fmt(ans)}%`
-    };
-  }
-  if (type==='pOf'){
-    const p = pick(lv===0?[10,25,50]:[10,20,25,30,40,50,60,75]);
-    const base = pick(lv===0?[20,40,60,80,100,120,200]:[40,60,80,120,160,240,300,400,500,800]);
-    const ans = p*base/100;
-    return {
-      q:`${p}% dari ${base} = ...`,
-      opts: numOptions(ans,[base-ans, p+base, base/p, ans*10]),
-      hint:`${p}% artinya ${p}/100. Kalikan ${p}/100 × ${base}.`,
-      exp:`${p}/100 × ${base} = ${fmt(ans)}.`, plain:`${p}% dari ${base}`, ansText:fmt(ans)
-    };
-  }
-  if (type==='d2f'){
-    const dens = lv===0?[10]:[10,100];
-    const den = pick(dens);
-    let num = rnd(1,den-1);
-    if (den===100 && num%10===0) num += rnd(1,9);
-    const ans = F(num,den);
-    const dec = num/den;
-    return {
-      q:`${fmt(dec)} = ... (pecahan paling sederhana)`,
-      opts: fracOptions(ans,[{n:num,d:den*10}, F(den,num), {n:num+1,d:den}, {n:num, d: den===10?100:10}]),
-      hint:`${fmt(dec)} dibaca per ${den===10?'sepuluh':'seratus'}. Tulis sebagai ${num}/${den}, lalu sederhanakan.`,
-      exp:`${fmt(dec)} = ${num}/${den} = ${ftext(ans)}.`, plain:`${fmt(dec)} sebagai pecahan`, ansText:ftext(ans)
-    };
-  }
-  if (type==='dadd'){
-    const a = rnd(11,99)/10, b = rnd(11,99)/ (lv===2?100:10);
-    const sub = Math.random()<0.5 && a>b;
-    const ans = Math.round((sub?a-b:a+b)*100)/100;
-    return {
-      q:`${fmt(a)} ${sub?'−':'+'} ${fmt(b)} = ...`,
-      opts: numOptions(ans,[Math.round((sub?a+b:a-b)*100)/100, ans+0.1, ans-0.1, ans+1],''),
-      hint:`Luruskan tanda komanya, lalu hitung seperti bilangan bulat.`,
-      exp:`${fmt(a)} ${sub?'−':'+'} ${fmt(b)} = ${fmt(ans)}.`, plain:`${fmt(a)} ${sub?'−':'+'} ${fmt(b)}`, ansText:fmt(ans)
-    };
-  }
-  // diskon
-  const price = pick([40000,50000,60000,80000,120000,150000,200000]);
-  const p = pick([10,20,25,30,40,50]);
-  const ans = price*(100-p)/100;
-  const rp = x => 'Rp' + x.toLocaleString('id-ID');
-  return {
-    q:`<span class="story">Harga tas ${rp(price)}. Ada diskon ${p}%. Berapa harga yang harus dibayar?</span>`,
-    opts: options(ans,[price*p/100, price-p, ans+5000, ans-5000, price*(100-p-10)/100], x=>String(x), rp),
-    hint:`Hitung potongannya dulu: ${p}% × ${rp(price)}. Lalu kurangkan dari harga awal.`,
-    exp:`Potongan = ${p}/100 × ${rp(price)} = ${rp(price*p/100)}. Bayar = ${rp(price)} − ${rp(price*p/100)} = ${rp(ans)}.`,
-    plain:`Diskon ${p}% dari ${rp(price)}`, ansText:rp(ans)
-  };
-}
-
-function genKPK(lv){
-  const type = pick(lv===0 ? ['kpk','fpb'] : ['kpk','fpb','storyK','storyF']);
-  const smallPairs = [[4,6],[6,8],[3,4],[4,10],[6,9],[8,12],[5,15],[6,10],[9,12],[10,15]];
-  const bigPairs = [[12,18],[15,20],[16,24],[18,24],[20,30],[24,36],[14,21],[18,27],[30,45],[28,42]];
-  const [a,b] = pick(lv===2?bigPairs:(lv===1?smallPairs.concat(bigPairs.slice(0,4)):smallPairs));
-  const K = lcm(a,b), G = gcd(a,b);
-  if (type==='kpk') return {
-    q:`KPK dari ${a} dan ${b} adalah ...`,
-    opts: numOptions(K,[a*b, G, K*2, a+b]),
-    hint:`Tulis kelipatan ${a}: ${a}, ${a*2}, ${a*3}, ... dan kelipatan ${b}. Cari yang sama paling kecil.`,
-    exp:`Kelipatan persekutuan terkecil ${a} dan ${b} adalah ${K}.`, plain:`KPK ${a} dan ${b}`, ansText:String(K)
-  };
-  if (type==='fpb') return {
-    q:`FPB dari ${a} dan ${b} adalah ...`,
-    opts: numOptions(G,[K, Math.min(a,b), G*2>Math.min(a,b)?G+1:G*2, 1]),
-    hint:`Tulis faktor ${a} dan faktor ${b}. Cari faktor sama yang paling besar.`,
-    exp:`Faktor persekutuan terbesar ${a} dan ${b} adalah ${G}.`, plain:`FPB ${a} dan ${b}`, ansText:String(G)
-  };
-  if (type==='storyK'){
-    const h = pick(['07.00','08.00','06.30']);
-    const [hh,mm] = h.split('.').map(Number);
-    const t = hh*60+mm+K; const jam = `${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`;
-    return {
-      q:`<span class="story">Lampu merah berkedip setiap ${a} menit, lampu hijau setiap ${b} menit. Keduanya berkedip bersama pukul ${h}. Pukul berapa mereka berkedip bersama lagi?</span>`,
-      opts: options(jam,[addMin(hh,mm,a*b),addMin(hh,mm,G),addMin(hh,mm,a+b),addMin(hh,mm,K*2)],x=>x,x=>'Pukul '+x),
-      hint:`Kejadian bersama berulang tiap KPK(${a}, ${b}) menit.`,
-      exp:`KPK ${a} dan ${b} = ${K} menit. ${h} + ${K} menit = pukul ${jam}.`, plain:`Lampu ${a} & ${b} menit dari ${h}`, ansText:'Pukul '+jam
-    };
-  }
-  const x = G*rnd(2,4), y = G*rnd(3,5);
-  const g2 = gcd(x,y);
-  return {
-    q:`<span class="story">Ada ${x} buku tulis dan ${y} pensil. Semuanya dibagi rata ke beberapa kantong dengan isi sama. Paling banyak berapa kantong yang bisa dibuat?</span>`,
-    opts: numOptions(g2,[lcm(x,y), x+y, Math.min(x,y), g2*2]),
-    hint:`Cari FPB dari ${x} dan ${y}.`,
-    exp:`FPB ${x} dan ${y} = ${g2}, jadi paling banyak ${g2} kantong. Tiap kantong berisi ${x/g2} buku dan ${y/g2} pensil.`,
-    plain:`Bagi rata ${x} buku & ${y} pensil`, ansText:`${g2} kantong`
-  };
-}
-function addMin(h,m,add){ const t=h*60+m+add; return `${String(Math.floor(t/60)%24).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`; }
-
-function genVolume(lv){
-  const type = pick(lv===0 ? ['kubus','balok'] : ['kubus','balok','sisi','liter', lv===2?'tinggi':'balok']);
-  if (type==='kubus'){
-    const s = rnd(2,[6,10,15][lv]);
-    const v = s**3;
-    return {
-      q:`Volume kubus dengan rusuk ${s} cm adalah ... cm³`,
-      opts: numOptions(v,[s*s, s*3, 6*s*s, s*s*2],'cm³'),
-      hint:`Volume kubus = rusuk × rusuk × rusuk.`,
-      exp:`${s} × ${s} × ${s} = ${v} cm³.`, plain:`Volume kubus rusuk ${s} cm`, ansText:`${v} cm³`
-    };
-  }
-  if (type==='balok'){
-    const p = rnd(3,[8,15,25][lv]), l = rnd(2,[6,10,15][lv]), t = rnd(2,[6,10,12][lv]);
-    const v = p*l*t;
-    return {
-      q:`Volume balok dengan panjang ${p} cm, lebar ${l} cm, dan tinggi ${t} cm adalah ... cm³`,
-      opts: numOptions(v,[p+l+t, p*l, 2*(p*l+p*t+l*t), p*l*t+p],'cm³'),
-      hint:`Volume balok = panjang × lebar × tinggi.`,
-      exp:`${p} × ${l} × ${t} = ${v} cm³.`, plain:`Volume balok ${p}×${l}×${t}`, ansText:`${v} cm³`
-    };
-  }
-  if (type==='sisi'){
-    const s = rnd(2,[5,9,12][lv]);
-    return {
-      q:`Sebuah kubus volumenya ${s**3} cm³. Panjang rusuknya ... cm`,
-      opts: numOptions(s,[s+1,s-1>0?s-1:s+2,s*2,Math.round(s**3/3)],'cm'),
-      hint:`Cari bilangan yang jika dikalikan tiga kali dengan dirinya sendiri hasilnya ${s**3}.`,
-      exp:`${s} × ${s} × ${s} = ${s**3}, jadi rusuknya ${s} cm.`, plain:`Rusuk kubus bervolume ${s**3} cm³`, ansText:`${s} cm`
-    };
-  }
-  if (type==='liter'){
-    const p = rnd(3,8)*10, l = rnd(2,6)*10, t = rnd(2,5)*10;
-    const L = p*l*t/1000;
-    return {
-      q:`<span class="story">Akuarium berbentuk balok berukuran ${p} cm × ${l} cm × ${t} cm. Berapa liter air untuk mengisinya penuh?</span>`,
-      opts: numOptions(L,[p*l*t/100, p*l*t/10000*10, L*10, L/10],'liter'),
-      hint:`Hitung volume dalam cm³, lalu ingat 1 liter = 1.000 cm³.`,
-      exp:`${p} × ${l} × ${t} = ${fmt(p*l*t)} cm³ = ${fmt(L)} liter.`, plain:`Akuarium ${p}×${l}×${t} cm`, ansText:`${fmt(L)} liter`
-    };
-  }
-  const p = rnd(5,15), l = rnd(3,10), t = rnd(3,12);
-  return {
-    q:`Balok bervolume ${p*l*t} cm³ punya panjang ${p} cm dan lebar ${l} cm. Tingginya ... cm`,
-    opts: numOptions(t,[p*l, t+2, t*2, p+l],'cm'),
-    hint:`Tinggi = volume : (panjang × lebar).`,
-    exp:`${p*l*t} : (${p} × ${l}) = ${p*l*t} : ${p*l} = ${t} cm.`, plain:`Tinggi balok ${p*l*t} cm³`, ansText:`${t} cm`
-  };
-}
-
-function genKecepatan(lv){
-  const type = pick(lv===0 ? ['v','s'] : ['v','s','t','debit', lv===2?'menit':'t']);
-  if (type==='v'){
-    const t = rnd(2,[4,5,6][lv]), v = pick([20,30,40,45,50,60,70,80]);
-    const s = v*t;
-    return {
-      q:`<span class="story">Pak Ali naik motor sejauh ${s} km dalam ${t} jam. Berapa kecepatan rata-ratanya?</span>`,
-      opts: numOptions(v,[s*t, s+t, s-t, v*2],'km/jam'),
-      hint:`Kecepatan = jarak : waktu.`,
-      exp:`${s} km : ${t} jam = ${v} km/jam.`, plain:`${s} km dalam ${t} jam`, ansText:`${v} km/jam`
-    };
-  }
-  if (type==='s'){
-    const t = rnd(2,[4,5,6][lv]), v = pick([15,20,40,50,60,65,75]);
-    return {
-      q:`<span class="story">Bus melaju ${v} km/jam selama ${t} jam. Berapa jarak yang ditempuh?</span>`,
-      opts: numOptions(v*t,[v+t, v*(t+1), v/t, v*t*2],'km'),
-      hint:`Jarak = kecepatan × waktu.`,
-      exp:`${v} km/jam × ${t} jam = ${v*t} km.`, plain:`${v} km/jam selama ${t} jam`, ansText:`${v*t} km`
-    };
-  }
-  if (type==='t'){
-    const v = pick([20,30,40,50,60]), t = rnd(2,6);
-    return {
-      q:`<span class="story">Jarak dua kota ${v*t} km. Mobil melaju ${v} km/jam. Berapa jam waktu tempuhnya?</span>`,
-      opts: numOptions(t,[v*t*v, t+1, t*2, v],'jam'),
-      hint:`Waktu = jarak : kecepatan.`,
-      exp:`${v*t} km : ${v} km/jam = ${t} jam.`, plain:`${v*t} km dengan ${v} km/jam`, ansText:`${t} jam`
-    };
-  }
-  if (type==='debit'){
-    const d = pick([2,3,4,5,6,8,10]), m = rnd(3,12);
-    return {
-      q:`<span class="story">Keran mengalirkan air ${d} liter/menit. Berapa liter air setelah ${m} menit?</span>`,
-      opts: numOptions(d*m,[d+m, d*m*2, Math.round(m/d)||1, d*(m-1)],'liter'),
-      hint:`Volume = debit × waktu.`,
-      exp:`${d} liter/menit × ${m} menit = ${d*m} liter.`, plain:`Debit ${d} L/menit, ${m} menit`, ansText:`${d*m} liter`
-    };
-  }
-  // menit -> jam conversion
-  const v = pick([30,40,60,80]); const menit = pick([15,30,45,90,120]);
-  const s = v*menit/60;
-  return {
-    q:`<span class="story">Sepeda listrik melaju ${v} km/jam selama ${menit} menit. Berapa km jarak yang ditempuh?</span>`,
-    opts: numOptions(s,[v*menit, v*menit/100, s*2, v+menit],'km'),
-    hint:`Ubah menit ke jam dulu: ${menit} menit = ${fmt(menit/60)} jam.`,
-    exp:`${menit} menit = ${fmt(menit/60)} jam. ${v} × ${fmt(menit/60)} = ${fmt(s)} km.`, plain:`${v} km/jam selama ${menit} menit`, ansText:`${fmt(s)} km`
-  };
-}
-
-/* ---------- scenery ---------- */
-const N = 10;
-// trail checkpoints in a 400x320 scene, base (0) to summit (10)
-const PTS = [[60,292],[150,282],[250,268],[330,246],[262,222],[170,200],[110,172],[176,146],[248,120],[214,92],[200,58]];
-function sceneSVG(withTrail){
-  const path = PTS.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' ');
-  const posts = withTrail ? PTS.map((p,i)=>`<g class="post" data-i="${i}"><circle cx="${p[0]}" cy="${p[1]}" r="${i===N?0:6}" fill="#FFFDF7" stroke="#1F5B3F" stroke-width="2.5"/></g>`).join('') : '';
-  return `<svg viewBox="0 0 400 320" role="img" aria-label="Jalur pendakian menuju puncak gunung">
-    <rect width="400" height="320" fill="#DDEFF6"/>
-    <circle cx="330" cy="62" r="26" fill="#F2C46D"/>
-    <path d="M0 210 L70 150 L120 185 L170 130 L215 170 L260 120 L320 175 L400 140 L400 320 L0 320 Z" fill="#B9DDEB"/>
-    <path d="M10 320 L200 40 L390 320 Z" fill="#2E7A55"/>
-    <path d="M200 40 L232 88 L216 84 L204 96 L190 82 L172 90 Z" fill="#FFFDF7"/>
-    <path d="M200 40 L390 320 L300 320 Z" fill="#1F5B3F" opacity=".55"/>
-    <path d="M0 300 C80 284 140 300 200 296 C270 290 330 304 400 296 L400 320 L0 320 Z" fill="#7FB069"/>
-    ${[[40,288],[78,280],[352,290],[372,280],[22,300]].map(([x,y])=>`<path d="M${x} ${y} l9 -22 l9 22 Z" fill="#1F5B3F"/>`).join('')}
-    ${withTrail?`<path d="${path}" fill="none" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 9"/>`:''}
-    ${posts}
-    ${withTrail?`<g transform="translate(200 58)"><line x1="0" y1="0" x2="0" y2="-26" stroke="#17322A" stroke-width="2.5"/><path d="M0 -26 L20 -20 L0 -13 Z" fill="#C9822B"/></g>`:''}
-    ${withTrail?`<g id="climber" transform="translate(${PTS[0][0]} ${PTS[0][1]})" style="transition:transform .7s cubic-bezier(.3,1.4,.5,1)">
-       <circle r="11" fill="#C9822B" stroke="#FFFDF7" stroke-width="3"/>
-       <circle cx="0" cy="-2" r="3.4" fill="#FFFDF7"/><path d="M-5 5 Q0 1 5 5" stroke="#FFFDF7" stroke-width="2" fill="none"/>
-     </g>`:''}
-  </svg>`;
-}
-$('heroScene').innerHTML = sceneSVG(false);
-$('trailScene').innerHTML = sceneSVG(true);
-
-const LEAF = `<svg class="leaf" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 C4 10 10 4 20 4 C20 14 14 20 4 20 Z" fill="#2E7A55"/><path d="M5 19 L15 9" stroke="#FFFDF7" stroke-width="1.6"/></svg>`;
-const STAR = on => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 l2.9 6.1 6.6.8 -4.9 4.6 1.3 6.6 L12 17.3 6.1 20.6 7.4 14 2.5 9.4 l6.6-.8 Z" fill="${on?'#C9822B':'#CFE0D6'}"/></svg>`;
-
-/* ---------- sound ---------- */
-let soundOn = true, actx = null;
-function beep(freqs, dur=0.12){
-  if (!soundOn) return;
-  try{
-    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
-    let t = actx.currentTime;
-    freqs.forEach(f=>{
-      const o = actx.createOscillator(), g = actx.createGain();
-      o.type='triangle'; o.frequency.value=f; o.connect(g); g.connect(actx.destination);
-      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-      o.start(t); o.stop(t+dur+0.02); t += dur*0.9;
-    });
-  }catch(e){}
-}
-$('soundBtn').addEventListener('click', e=>{
-  soundOn = !soundOn; e.currentTarget.setAttribute('aria-pressed', soundOn);
-  e.currentTarget.textContent = 'Suara: ' + (soundOn?'Nyala':'Mati');
-});
-
-/* ---------- storage (best score per topic+level) ---------- */
-const store = {
-  get(k){ try{ return JSON.parse(localStorage.getItem('jgm:'+k)); }catch(e){ return null; } },
-  set(k,v){ try{ localStorage.setItem('jgm:'+k, JSON.stringify(v)); }catch(e){} }
-};
-
-/* ---------- setup screen ---------- */
-let state = {topic:'all', level:'sedang', name:''};
-const topicList = $('topicList');
-[...TOPICS, {id:'all', name:'Semua jalur', desc:'Campuran dari kelima topik'}].forEach(t=>{
-  const b = document.createElement('button');
-  b.type='button'; b.className='topic'+(t.id==='all'?' all':''); b.dataset.id=t.id;
-  b.innerHTML = `<b>${t.name}</b><span>${t.desc}</span>`;
-  b.setAttribute('aria-pressed', t.id===state.topic);
-  b.addEventListener('click',()=>{ state.topic=t.id; [...topicList.children].forEach(x=>x.setAttribute('aria-pressed', x.dataset.id===t.id)); updateBest(); });
-  topicList.appendChild(b);
-});
-const levelList = $('levelList');
-[['mudah','Mudah'],['sedang','Sedang'],['sulit','Sulit']].forEach(([id,label])=>{
-  const b = document.createElement('button');
-  b.type='button'; b.className='level'; b.dataset.id=id; b.textContent=label;
-  b.setAttribute('aria-pressed', id===state.level);
-  b.addEventListener('click',()=>{ state.level=id; [...levelList.children].forEach(x=>x.setAttribute('aria-pressed', x.dataset.id===id)); updateBest(); });
-  levelList.appendChild(b);
-});
-const savedName = store.get('name'); if (savedName) $('playerName').value = savedName;
-const savedPhone = store.get('phone'); if (savedPhone) $('parentPhone').value = savedPhone;
-// Normalise Indonesian numbers to 62xxxxxxxxxx; returns '' when empty, null when invalid
-function normPhone(raw){
-  let d = String(raw||'').replace(/[^0-9+]/g,'');
-  if (!d) return '';
-  d = d.replace(/^\+/,'');
-  if (d.startsWith('0')) d = '62' + d.slice(1);
-  else if (d.startsWith('8')) d = '62' + d;
-  return /^62\d{8,13}$/.test(d) ? d : null;
-}
-$('parentPhone').addEventListener('input', ()=>{
-  const v = normPhone($('parentPhone').value);
-  $('phoneNote').textContent = v===null ? 'Nomor belum lengkap. Contoh yang benar: 0812 3456 7890.' : 'Hasil latihan bisa dikirim ke nomor ini setelah selesai bermain.';
-});
-function topicName(id){ return id==='all' ? 'Semua jalur' : TOPICS.find(t=>t.id===id).name; }
-function updateBest(){
-  const b = store.get(`best:${state.topic}:${state.level}`);
-  $('bestLine').textContent = b ? `Rekor di perangkat ini untuk ${topicName(state.topic)} (${state.level}): ${b.score} poin oleh ${b.name}.` : `Belum ada rekor untuk ${topicName(state.topic)} (${state.level}). Jadilah yang pertama!`;
-}
-updateBest();
-
-/* ---------- game ---------- */
-const TIME = {mudah:45, sedang:30, sulit:25};
-let G = null, timerId = null;
-
-function newQuestion(){
-  const t = state.topic==='all' ? pick(TOPICS) : TOPICS.find(x=>x.id===state.topic);
-  let q;
-  for (let tries=0; tries<20; tries++){ q = t.gen(LV[state.level]); if (q.opts.length===4) break; }
-  q.topic = t.name; return q;
-}
-function startGame(){
-  state.name = ($('playerName').value.trim() || 'Penjelajah');
-  store.set('name', state.name);
-  const ph = normPhone($('parentPhone').value);
-  state.phone = ph || '';
-  store.set('phone', $('parentPhone').value.trim());
-  G = {i:0, pos:0, score:0, lives:3, log:[], q:null, answered:false, hinted:false, t0:0};
-  show('gameScreen');
-  moveClimber(0);
-  nextQuestion();
-}
-function show(id){ ['startScreen','gameScreen','resultScreen'].forEach(s=>$(s).hidden = s!==id); window.scrollTo({top:0,behavior:'smooth'}); }
-function renderLives(){ $('lives').innerHTML = [0,1,2].map(i=> LEAF.replace('class="leaf"', `class="leaf${i>=G.lives?' lost':''}"`)).join(''); }
-function moveClimber(p){
-  const c = document.getElementById('climber'); if (!c) return;
-  const [x,y] = PTS[Math.min(p,N)]; c.setAttribute('transform', `translate(${x} ${y})`);
-  document.querySelectorAll('#trailScene .post circle').forEach((el,i)=>{ el.setAttribute('fill', i<=p && i<N ? '#C9822B':'#FFFDF7'); });
-}
-function nextQuestion(){
-  if (G.i>=N || G.lives<=0) return finish();
-  G.q = newQuestion(); G.answered=false; G.hinted=false;
-  $('qTopic').textContent = G.q.topic;
-  $('qNum').textContent = `Soal ${G.i+1} dari ${N}`;
-  $('question').innerHTML = G.q.q;
-  $('hintBox').hidden = true; $('hintBtn').disabled = false;
-  $('feedback').hidden = true;
-  const box = $('answers'); box.innerHTML='';
-  G.q.opts.forEach((o,idx)=>{
-    const b = document.createElement('button'); b.type='button'; b.className='ans';
-    b.innerHTML = `<span class="key">${idx+1}</span><span>${o.html}</span>`;
-    b.addEventListener('click',()=>answer(idx));
-    box.appendChild(b);
-  });
-  $('score').textContent = G.score; $('pos').textContent = `${G.pos}/${N}`; renderLives();
-  $('card').classList.remove('pop'); void $('card').offsetWidth; $('card').classList.add('pop');
-  startTimer();
-}
-function startTimer(){
-  clearInterval(timerId);
-  const total = TIME[state.level]; G.t0 = performance.now();
-  const bar = $('timerBar'), tm = $('timer');
-  const tick = ()=>{
-    const left = Math.max(0, total - (performance.now()-G.t0)/1000);
-    bar.style.transform = `scaleX(${left/total})`;
-    tm.classList.toggle('low', left < total*0.25);
-    $('timeLeft').textContent = `Sisa waktu ${Math.ceil(left)} detik`;
-    if (left<=0){ clearInterval(timerId); answer(-1); }
-  };
-  tick(); timerId = setInterval(tick, 200);
-}
-function answer(idx){
-  if (G.answered) return; G.answered = true; clearInterval(timerId);
-  const btns = [...$('answers').children];
-  const correctIdx = G.q.opts.findIndex(o=>o.ok);
-  btns.forEach((b,i)=>{ b.disabled=true; if (i===correctIdx) b.classList.add('right'); });
-  const ok = idx===correctIdx;
-  const fb = $('feedback'); fb.hidden=false; fb.className = 'feedback ' + (ok?'ok':'no');
-  if (ok){
-    const left = Math.max(0, TIME[state.level] - (performance.now()-G.t0)/1000);
-    const gain = 10 + Math.round(left/TIME[state.level]*10) - (G.hinted?5:0);
-    G.score += Math.max(5,gain); G.pos++;
-    $('fbTitle').textContent = pick(['Benar! Naik satu pos.','Mantap, kamu naik!','Tepat sekali!','Hebat, terus mendaki!']);
-    beep([523,659,784]);
+let last=null;
+function run(focus=true){
+  const v = validate(); if (!v) return;
+  const out=$('out');
+  if (mode==='pegawai'){
+    const status=$('status').value, iuran=parseRp($('iuran').value), zakat=parseRp($('zakat').value);
+    const r = calcPegawai(status, v.gaji, iuran, zakat);
+    last = {mode, ...v, status, r};
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov'];
+    out.innerHTML = `
+      <div class="who"><div><b>${esc(v.nama)}</b><div class="meta num">NIK ${maskNik(v.nik)}</div></div>
+        <span class="badge">Karyawan tetap · ${status} · TER kategori ${r.cat}</span></div>
+      <div class="kpis">
+        <div class="kpi main"><div class="k">PPh 21 per bulan (Jan–Nov)</div><div class="v">${rp(r.terBulan)}</div></div>
+        <div class="kpi"><div class="k">PPh 21 Desember</div><div class="v">${rpS(r.des)}</div></div>
+        <div class="kpi"><div class="k">Gaji bersih per bulan</div><div class="v">${rp(r.thpBulan)}</div></div>
+      </div>
+      ${r.des<0?`<div class="callout refund">Pajak yang dipotong Januari–November lebih besar dari pajak setahun. Kelebihan ${rp(-r.des)} dikembalikan pemberi kerja bersama gaji Desember.</div>`:''}
+      <div><h3>Potongan per bulan</h3>
+        <div class="months" style="margin-top:8px">${months.map(m=>`<div class="m"><div class="k">${m}</div><div class="v">${rp(r.terBulan)}</div></div>`).join('')}<div class="m des"><div class="k">Des</div><div class="v">${rpS(r.des)}</div></div></div>
+      </div>
+      <div><h3>Januari–November: tarif efektif (TER)</h3>
+        <table class="steps"><tbody>
+          <tr><td>Gaji kotor sebulan</td><td>${rp(v.gaji)}</td></tr>
+          <tr><td>Tarif TER kategori ${r.cat} untuk gaji ini</td><td>${pct(r.rate)}</td></tr>
+          <tr class="total"><td>PPh 21 per bulan = ${rp(v.gaji)} × ${pct(r.rate)}</td><td>${rp(r.terBulan)}</td></tr>
+        </tbody></table>
+      </div>
+      <div><h3>Desember: hitungan setahun (Pasal 17)</h3>
+        <table class="steps"><tbody>
+          <tr><td>Penghasilan bruto setahun (12 × gaji)</td><td>${rp(r.bruto)}</td></tr>
+          <tr><td>Biaya jabatan 5% (maks. Rp6.000.000)</td><td>−${rp(r.bj)}</td></tr>
+          ${r.iuranTh?`<tr><td>Iuran JHT + JP setahun</td><td>−${rp(r.iuranTh)}</td></tr>`:''}
+          ${r.zakatTh?`<tr><td>Zakat lewat pemberi kerja setahun</td><td>−${rp(r.zakatTh)}</td></tr>`:''}
+          <tr><td>Penghasilan neto setahun</td><td>${rp(r.neto)}</td></tr>
+          <tr><td>PTKP ${status}</td><td>−${rp(r.ptkp)}</td></tr>
+          <tr><td>Penghasilan kena pajak (dibulatkan ke bawah ribuan)</td><td>${rp(r.pkp)}</td></tr>
+          ${r.layers.map(l=>`<tr class="sub"><td>&nbsp;&nbsp;${pct(l.r)} × ${rp(l.span)}</td><td>${rp(l.tax)}</td></tr>`).join('')}
+          <tr><td>PPh 21 terutang setahun</td><td>${rp(r.setahun)}</td></tr>
+          <tr><td>Sudah dipotong Jan–Nov (11 × ${rp(r.terBulan)})</td><td>−${rp(r.terBulan*11)}</td></tr>
+          <tr class="total"><td>PPh 21 Desember</td><td>${rpS(r.des)}</td></tr>
+        </tbody></table>
+      </div>
+      <div><h3>Penyetoran</h3>
+        <table class="steps"><tbody>
+          <tr><td>Yang menyetor</td><td>Pemberi kerja</td></tr>
+          <tr><td>Disetor per bulan (Jan–Nov) · Desember</td><td>${rp(r.terBulan)} · ${rp(Math.max(0,r.des))}</td></tr>
+          <tr><td>KAP-KJS di kode billing</td><td>411121-100</td></tr>
+          <tr><td>Setor paling lambat</td><td>tgl 15 bulan berikutnya</td></tr>
+          <tr><td>Lapor SPT Masa PPh 21/26</td><td>tgl 20 bulan berikutnya</td></tr>
+          <tr class="total"><td>Total disetor setahun</td><td>${rp(r.setahun)}</td></tr>
+        </tbody></table>
+        <p class="note" style="margin-top:8px">Setor ke kas negara memakai kode billing dari Coretax DJP (coretaxdjp.pajak.go.id → Pembayaran → Layanan Mandiri Kode Billing), dibayar lewat bank/pos persepsi, mobile banking, atau Deposit Pajak. Bukti potong: BPMP (Jan–Nov) dan BPA1 (Desember). Jadwal lengkap per bulan ada di lampiran PDF.</p>
+      </div>
+      <div class="btns"><button class="primary" type="button" id="addRow">Tambahkan ke daftar</button><button class="ghost" type="button" id="pdfOne">Unduh lampiran PDF</button><button class="ghost" type="button" id="copyOne">Salin ringkasan</button></div><p class="note" id="pdfMsg" role="status"></p>`;
   } else {
-    if (idx>=0) btns[idx].classList.add('wrong');
-    G.lives--;
-    $('fbTitle').textContent = idx<0 ? 'Waktu habis. Satu daun gugur.' : 'Belum tepat. Satu daun gugur.';
-    $('card').classList.remove('shake'); void $('card').offsetWidth; $('card').classList.add('shake');
-    beep([330,247],0.16);
+    const r = calcBukan(v.gaji);
+    last = {mode, ...v, status:'—', r};
+    out.innerHTML = `
+      <div class="who"><div><b>${esc(v.nama)}</b><div class="meta num">NIK ${maskNik(v.nik)}</div></div>
+        <span class="badge">Perorangan bukan pegawai</span></div>
+      <div class="kpis">
+        <div class="kpi main"><div class="k">PPh 21 dipotong</div><div class="v">${rp(r.tax)}</div></div>
+        <div class="kpi"><div class="k">Tarif efektif</div><div class="v">${pct(r.eff)}</div></div>
+        <div class="kpi"><div class="k">Diterima bersih</div><div class="v">${rp(r.net)}</div></div>
+      </div>
+      <div><h3>Cara hitung</h3>
+        <table class="steps"><tbody>
+          <tr><td>Honor / imbalan bruto</td><td>${rp(v.gaji)}</td></tr>
+          <tr><td>Dasar pemotongan = 50% × bruto</td><td>${rp(r.dpp)}</td></tr>
+          ${r.layers.map(l=>`<tr class="sub"><td>&nbsp;&nbsp;${pct(l.r)} × ${rp(l.span)}</td><td>${rp(l.tax)}</td></tr>`).join('')}
+          <tr class="total"><td>PPh 21 terutang</td><td>${rp(r.tax)}</td></tr>
+        </tbody></table>
+      </div>
+      <div><h3>Penyetoran</h3>
+        <table class="steps"><tbody>
+          <tr><td>Yang menyetor</td><td>Pemberi honor</td></tr>
+          <tr><td>Jumlah disetor</td><td>${rp(r.tax)}</td></tr>
+          <tr><td>KAP-KJS di kode billing</td><td>411121-100</td></tr>
+          <tr><td>Setor paling lambat</td><td>tgl 15 bulan berikutnya</td></tr>
+          <tr><td>Lapor SPT Masa PPh 21/26</td><td>tgl 20 bulan berikutnya</td></tr>
+        </tbody></table>
+        <p class="note" style="margin-top:8px">Kode billing dibuat di Coretax DJP lalu dibayar lewat bank/pos persepsi, mobile banking, atau Deposit Pajak. Penerima mendapat bukti potong BP21.</p>
+      </div>
+      <p class="note">Berlaku untuk bukan pegawai seperti narasumber, konsultan, tenaga ahli, atau freelancer (PMK 168/2023). Dihitung per pembayaran dan tidak diakumulasi antar bulan. Tidak memakai PTKP; kelebihan dapat diperhitungkan di SPT Tahunan.</p>
+      <div class="btns"><button class="primary" type="button" id="addRow">Tambahkan ke daftar</button><button class="ghost" type="button" id="pdfOne">Unduh lampiran PDF</button><button class="ghost" type="button" id="copyOne">Salin ringkasan</button></div><p class="note" id="pdfMsg" role="status"></p>`;
   }
-  $('fbText').innerHTML = `<b>Pembahasan:</b> ${G.q.exp}`;
-  G.log.push({q:G.q.plain, a:G.q.ansText, ok, exp:G.q.exp});
-  G.i++;
-  $('score').textContent = G.score; $('pos').textContent = `${G.pos}/${N}`; renderLives(); moveClimber(G.pos);
-  $('nextBtn').textContent = (G.i>=N || G.lives<=0) ? 'Lihat hasil' : 'Lanjut';
-  $('hintBtn').disabled = true;
-  $('nextBtn').focus({preventScroll:true});
+  $('empty').hidden=true; out.hidden=false;
+  $('addRow').addEventListener('click', addRow);
+  $('copyOne').addEventListener('click', e=>copy(summary(last), e.currentTarget));
+  $('pdfOne').addEventListener('click', ()=>pdfOne(last));
+  if (focus && window.innerWidth<860) out.scrollIntoView({behavior:'smooth',block:'start'});
 }
-$('nextBtn').addEventListener('click', nextQuestion);
-$('hintBtn').addEventListener('click', ()=>{ if (G.answered) return; G.hinted = true; $('hintBox').hidden=false; $('hintBox').textContent = G.q.hint; $('hintBtn').disabled = true; });
-
-function finish(){
-  clearInterval(timerId);
-  const correct = G.log.filter(l=>l.ok).length;
-  const stars = G.pos>=N ? (G.lives===3?3:2) : (correct>=5?1:0);
-  $('resTitle').textContent = G.pos>=N ? `${state.name} sampai di puncak!` : `${state.name} berhenti di pos ${G.pos}.`;
-  $('stars').innerHTML = [0,1,2].map(i=>STAR(i<stars)).join('');
-  $('resScore').textContent = G.score;
-  const key = `best:${state.topic}:${state.level}`, best = store.get(key);
-  let rec = '';
-  if (G.score>0 && (!best || G.score > best.score)){ store.set(key,{score:G.score,name:state.name}); rec = ' Ini rekor baru di perangkat ini!'; }
-  $('resText').textContent = `${correct} dari ${G.log.length} soal benar di jalur ${topicName(state.topic)}, tingkat ${state.level}.${rec}` + (G.pos<N ? ' Coba lagi untuk mencapai puncak.' : '');
-  $('recap').innerHTML = G.log.map(l=>`<li><span class="mark ${l.ok?'y':'n'}">${l.ok?'✓':'✗'}</span><div><div class="q">${l.q}</div><div class="a">Jawaban: ${l.a}. ${l.exp}</div></div></li>`).join('');
-  // WhatsApp report for parents
-  const wrong = G.log.filter(l=>!l.ok);
-  const tgl = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const strip = s => s.replace(/<[^>]+>/g,'');
-  const msg = [
-    `Halo Bapak/Ibu, berikut hasil latihan matematika ${state.name} di *Math with Yendi*.`,
-    ``,
-    `Tanggal: ${tgl}`,
-    `Materi: ${topicName(state.topic)} (tingkat ${state.level})`,
-    `Benar: ${correct} dari ${G.log.length} soal`,
-    `Skor: ${G.score} · Bintang: ${stars}/3`,
-    `Status: ${G.pos>=N ? 'sampai di puncak' : 'berhenti di pos '+G.pos+' dari '+N}`,
-    ...(wrong.length ? [``, `Soal yang perlu dipelajari lagi:`, ...wrong.slice(0,5).map(l=>`- ${strip(l.q)} (jawaban: ${l.a})`)] : [``, `Semua soal dijawab benar. Hebat!`]),
-    ``,
-    `Main lagi: https://akaiyendi00itsar.github.io/math-with-yendi/`,
-    `Pak Yendi · @pakyendi.id`
-  ].join('\n');
-  G.msg = msg;
-  const esc = t => t.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-  $('msgPreview').innerHTML = esc(msg).replace(/\*([^*\n]+)\*/g,'<b>$1</b>');
-  $('waLink').href = `https://wa.me/${state.phone}?text=${encodeURIComponent(msg)}`;
-  $('waLabel').textContent = state.phone ? 'Kirim hasil ke WhatsApp orang tua' : 'Kirim hasil lewat WhatsApp';
-  $('waNote').textContent = state.phone
-    ? `WhatsApp akan terbuka ke nomor +${state.phone} dengan pesan yang sudah terisi. Ketuk Kirim di WhatsApp.`
-    : `Nomor orang tua belum diisi, jadi pilih kontaknya sendiri di WhatsApp. Jika WhatsApp tidak terbuka, pakai Salin pesan.`;
-  $('copyBtn').textContent = 'Salin pesan';
-  if (G.pos>=N) beep([523,659,784,1047],0.15);
-  show('resultScreen');
+function esc(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function summary(x){
+  if (!x) return '';
+  if (x.mode==='pegawai') return `Perhitungan PPh 21 — ${x.nama} (NIK ${maskNik(x.nik)})\nStatus ${x.status}, TER kategori ${x.r.cat}\nGaji kotor/bulan: ${rp(x.gaji)}\nPPh 21 Jan–Nov: ${rp(x.r.terBulan)}/bulan (TER ${pct(x.r.rate)})\nPPh 21 Desember: ${rpS(x.r.des)}\nPPh 21 setahun: ${rp(x.r.setahun)}\nGaji bersih/bulan: ${rp(x.r.thpBulan)}\nDisetor pemberi kerja: KAP-KJS 411121-100, paling lambat tgl 15 bulan berikutnya (kode billing Coretax DJP)`;
+  return `Perhitungan PPh 21 bukan pegawai — ${x.nama} (NIK ${maskNik(x.nik)})\nBruto: ${rp(x.gaji)}\nPPh 21: ${rp(x.r.tax)} (50% × bruto × tarif Pasal 17)\nDiterima bersih: ${rp(x.r.net)}\nDisetor pemberi honor: KAP-KJS 411121-100, paling lambat tgl 15 bulan berikutnya`;
 }
-$('setupForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const nm = $('playerName').value.trim(), ph = normPhone($('parentPhone').value);
-  $('playerName').classList.toggle('invalid', !nm);
-  $('parentPhone').classList.toggle('invalid', !ph);
-  if (!nm){ $('nameNote').textContent='Nama penjelajah wajib diisi.'; $('nameNote').classList.add('err'); $('playerName').focus(); return; }
-  $('nameNote').textContent='Tulis nama lengkap atau nama panggilan.'; $('nameNote').classList.remove('err');
-  if (!ph){ $('phoneNote').textContent = ph===null ? 'Nomor belum lengkap. Contoh yang benar: 0812 3456 7890.' : 'Nomor WhatsApp orang tua wajib diisi.'; $('phoneNote').classList.add('err'); $('parentPhone').focus(); return; }
-  $('phoneNote').classList.remove('err');
-  startGame();
-});
-$('copyBtn').addEventListener('click', ()=>{
-  const done = ()=>{ $('copyBtn').textContent = 'Pesan tersalin'; };
-  const fallback = ()=>{
-    const ta = document.createElement('textarea'); ta.value = G.msg; ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ $('waNote').textContent = 'Tidak bisa menyalin otomatis di perangkat ini.'; } ta.remove();
-  };
-  try{ navigator.clipboard.writeText(G.msg).then(done, fallback); }catch(e){ fallback(); }
-});
-$('againBtn').addEventListener('click', startGame);
-$('menuBtn').addEventListener('click', ()=>{ updateBest(); show('startScreen'); });
+function copy(text, btn){
+  const done=()=>{ const t=btn.textContent; btn.textContent='Tersalin'; setTimeout(()=>btn.textContent=t,1500); };
+  const fb=()=>{ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); done();}catch(e){} ta.remove(); };
+  try{ navigator.clipboard.writeText(text).then(done,fb); }catch(e){ fb(); }
+}
 
-document.addEventListener('keydown', e=>{
-  if ($('gameScreen').hidden) return;
-  if (!G.answered && ['1','2','3','4'].includes(e.key)){ answer(Number(e.key)-1); }
-  else if (G.answered && e.key==='Enter' && document.activeElement!==$('nextBtn')){ nextQuestion(); }
+/* roster (memory only) */
+const roster=[];
+function addRow(){
+  if (!last) return;
+  roster.push(JSON.parse(JSON.stringify(last)));
+  drawRoster();
+  $('rosterCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function drawRoster(){
+  $('rosterCard').hidden = roster.length===0;
+  let tb=0,tt=0,td=0;
+  $('rows').innerHTML = roster.map((x,i)=>{
+    const ter = x.mode==='pegawai'? x.r.terBulan : x.r.tax;
+    const des = x.mode==='pegawai'? x.r.des : x.r.tax;
+    tb+=x.gaji; tt+=ter; td+=des;
+    return `<tr><td>${esc(x.nama)}</td><td class="num">${maskNik(x.nik)}</td><td>${x.mode==='pegawai'?'Karyawan':'Bukan pegawai'}</td><td>${x.status}</td><td class="r">${rp(x.gaji)}</td><td class="r">${rp(ter)}</td><td class="r">${rpS(des)}</td><td><button class="x" type="button" data-i="${i}" aria-label="Hapus ${esc(x.nama)}">×</button></td></tr>`;
+  }).join('');
+  $('tBruto').textContent=rp(tb); $('tTer').textContent=rp(tt); $('tDes').textContent=rpS(td);
+  $('rows').querySelectorAll('.x').forEach(b=>b.addEventListener('click',()=>{ roster.splice(+b.dataset.i,1); drawRoster(); }));
+}
+$('clearAll').addEventListener('click',()=>{ roster.length=0; drawRoster(); });
+$('copyAll').addEventListener('click',e=>{
+  const lines = ['Nama\tNIK\tJenis\tStatus\tBruto/bulan\tPPh21 Jan-Nov\tPPh21 Des', ...roster.map(x=>[x.nama,maskNik(x.nik),x.mode==='pegawai'?'Karyawan':'Bukan pegawai',x.status,Math.round(x.gaji),x.mode==='pegawai'?x.r.terBulan:x.r.tax,x.mode==='pegawai'?x.r.des:x.r.tax].join('\t'))];
+  copy(lines.join('\n'), e.currentTarget);
 });
+
+$('f').addEventListener('submit',e=>{ e.preventDefault(); run(); });
+$('contoh').addEventListener('click',()=>{
+  $('nama').value='Contoh Karyawan'; $('nik').value='3276 0000 0000 0001';
+  $('gaji').value=(10000000).toLocaleString('id-ID'); $('status').value='TK/0';
+  if (mode!=='pegawai') document.querySelector('[data-mode="pegawai"]').click();
+  run(false);
+});
+
+/* ---- PDF lampiran ---- */
+const TAHUN = 2026;
+const bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const blnS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function due(m, day){ const mm=(m+1)%12, yy = m===11 ? TAHUN+1 : TAHUN; return day + ' ' + blnS[mm] + ' ' + yy; }
+
+const PHOTO = (document.querySelector('img.avatar')||{}).src || '';
+const plain = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+const plainS = n => (n<0?'-':'') + plain(Math.abs(n));
+const pctP = r => (r*100).toLocaleString('id-ID',{maximumFractionDigits:2}) + '%';
+const nikFmt = n => n.replace(/(\d{4})(?=\d)/g,'$1 ');
+function tgl(){ return new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); }
+function slug(t){ return t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'wajib-pajak'; }
+function newDoc(title){
+  const J = window.jspdf && window.jspdf.jsPDF; if (!J) return null;
+  const d = new J({unit:'mm', format:'a4'});
+  const W = 210, M = 18;
+  // header band
+  d.setFillColor(15,92,92); d.rect(0,0,W,30,'F');
+  if (PHOTO.startsWith('data:image')) { try{ d.addImage(PHOTO,'JPEG',M,5,16,20); }catch(e){} }
+  d.setTextColor(255,255,255); d.setFont('helvetica','bold'); d.setFontSize(15);
+  d.text(title || 'Hitung PPh 21 bersama Pak Yendi', M+21, 13);
+  d.setFont('helvetica','normal'); d.setFontSize(9);
+  d.text('Yendi Septiyendi, S.Kom., Gr., CTT  |  Certified Tax Technician (Brevet A&B, ATPI)  |  IG @pakyendi.id', M+21, 19);
+  d.text('Dicetak ' + tgl(), M+21, 24);
+  d.setTextColor(27,42,51);
+  return {d, W, M, y:40};
+}
+function h2(c, t){ c.d.setFont('helvetica','bold'); c.d.setFontSize(11); c.d.setTextColor(15,92,92); c.d.text(t.toUpperCase(), c.M, c.y); c.y+=2; c.d.setDrawColor(220,216,204); c.d.line(c.M, c.y, c.W-c.M, c.y); c.y+=6; c.d.setTextColor(27,42,51); }
+function row(c, label, val, opt={}){
+  if (c.y > 275){ c.d.addPage(); c.y = 20; }
+  c.d.setFont('helvetica', opt.bold?'bold':'normal'); c.d.setFontSize(opt.small?9:10);
+  if (opt.muted) c.d.setTextColor(90,106,114);
+  const lines = c.d.splitTextToSize(label, c.W-2*c.M-48);
+  c.d.text(lines, c.M+(opt.indent?4:0), c.y);
+  c.d.setFont('courier', opt.bold?'bold':'normal');
+  c.d.text(String(val), c.W-c.M, c.y, {align:'right'});
+  c.d.setTextColor(27,42,51);
+  c.y += 5.6*lines.length;
+  if (opt.rule){ c.d.setDrawColor(27,42,51); c.d.line(c.M, c.y-3.6, c.W-c.M, c.y-3.6); c.y+=1.5; }
+}
+function para(c, t, size=9){ c.d.setFont('helvetica','normal'); c.d.setFontSize(size); c.d.setTextColor(90,106,114); const ls=c.d.splitTextToSize(t, c.W-2*c.M); if (c.y+ls.length*4.2>285){c.d.addPage(); c.y=20;} c.d.text(ls, c.M, c.y); c.y+=ls.length*4.2+2; c.d.setTextColor(27,42,51); }
+function footer(c){
+  const n = c.d.getNumberOfPages();
+  for (let i=1;i<=n;i++){ c.d.setPage(i); c.d.setFont('helvetica','normal'); c.d.setFontSize(8); c.d.setTextColor(120,130,135);
+    c.d.text(c.foot || 'Disusun dengan kalkulator Hitung PPh 21 bersama Pak Yendi. Perkiraan; bukan bukti potong resmi.', c.M, 290);
+    c.d.text('Hal. '+i+'/'+n, c.W-c.M, 290, {align:'right'}); }
+}
+async function savePdf(doc, filename, msgEl){
+  const blob = doc.output('blob');
+  const say = t => { if (msgEl) msgEl.textContent = t; };
+  try{
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+    if (dl){
+      try{ await dl.save({filename, data: blob}); say('PDF tersimpan: ' + filename); }
+      catch(e){ say(e && e.code==='declined' ? 'Unduhan dibatalkan.' : 'PDF tidak bisa diunduh di tampilan ini.'); }
+      return;
+    }
+  }catch(e){}
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  say('PDF diunduh: ' + filename);
+}
+function identity(c, x){
+  h2(c, 'Identitas');
+  row(c, 'Nama', x.nama); row(c, 'NIK', nikFmt(x.nik));
+  row(c, 'Jenis penerima', x.mode==='pegawai' ? 'Karyawan tetap' : 'Bukan pegawai');
+  if (x.mode==='pegawai') row(c, 'Status PTKP / kategori TER', x.status + ' / ' + x.r.cat);
+  c.y += 3;
+}
+function pdfOne(x){
+  const msg = $('pdfMsg');
+  if (!x) return;
+  const d = buildOne(x); if (!d){ msg.textContent = 'Pembuat PDF belum termuat. Periksa koneksi internet lalu coba lagi.'; return; }
+  savePdf(d, 'Lampiran-PPh21-' + slug(x.nama) + '.pdf', msg);
+}
+function buildOne(x){
+  const c = newDoc(); if (!c) return null;
+  c.d.setFont('helvetica','bold'); c.d.setFontSize(16); c.d.text('Lampiran Perhitungan PPh Pasal 21', c.M, c.y); c.y += 6;
+  c.d.setFont('helvetica','normal'); c.d.setFontSize(10); c.d.setTextColor(90,106,114); c.d.text('Tahun pajak 2026', c.M, c.y); c.d.setTextColor(27,42,51); c.y += 10;
+  identity(c, x);
+  if (x.mode==='pegawai'){
+    const r = x.r;
+    h2(c, 'Ringkasan');
+    row(c, 'Gaji kotor per bulan', plain(x.gaji));
+    row(c, 'PPh 21 per bulan (Januari-November)', plain(r.terBulan), {bold:true});
+    row(c, 'PPh 21 Desember', plainS(r.des), {bold:true});
+    row(c, 'PPh 21 setahun', plain(r.setahun));
+    row(c, 'Gaji bersih per bulan (Jan-Nov)', plain(r.thpBulan));
+    if (r.des<0) para(c, 'Pajak Januari-November lebih besar dari pajak setahun. Kelebihan ' + plain(-r.des) + ' dikembalikan pemberi kerja bersama gaji Desember.');
+    c.y += 3;
+    h2(c, 'Januari-November: tarif efektif rata-rata (TER)');
+    row(c, 'Gaji kotor sebulan', plain(x.gaji));
+    row(c, 'Tarif TER kategori ' + r.cat, pctP(r.rate));
+    row(c, 'PPh 21 per bulan = ' + plain(x.gaji) + ' x ' + pctP(r.rate), plain(r.terBulan), {bold:true, rule:true});
+    c.y += 3;
+    h2(c, 'Desember: hitungan setahun (tarif Pasal 17)');
+    row(c, 'Penghasilan bruto setahun (12 x gaji)', plain(r.bruto));
+    row(c, 'Biaya jabatan 5% (maks. Rp 6.000.000)', '-' + plain(r.bj));
+    if (r.iuranTh) row(c, 'Iuran JHT + Jaminan Pensiun setahun', '-' + plain(r.iuranTh));
+    if (r.zakatTh) row(c, 'Zakat melalui pemberi kerja setahun', '-' + plain(r.zakatTh));
+    row(c, 'Penghasilan neto setahun', plain(r.neto));
+    row(c, 'PTKP ' + x.status, '-' + plain(r.ptkp));
+    row(c, 'Penghasilan kena pajak (dibulatkan ke bawah ribuan)', plain(r.pkp));
+    r.layers.forEach(l => row(c, pctP(l.r) + ' x ' + plain(l.span), plain(l.tax), {indent:true, muted:true, small:true}));
+    row(c, 'PPh 21 terutang setahun', plain(r.setahun));
+    row(c, 'Sudah dipotong Jan-Nov (11 x ' + plain(r.terBulan) + ')', '-' + plain(r.terBulan*11));
+    row(c, 'PPh 21 Desember', plainS(r.des), {bold:true, rule:true});
+    c.y += 3;
+    h2(c, 'Penyetoran dan pelaporan');
+    row(c, 'Yang menyetor', 'Pemberi kerja (pemotong)');
+    row(c, 'Kode akun pajak - jenis setoran (KAP-KJS)', '411121-100', {bold:true});
+    row(c, 'Total yang disetor untuk penerima ini setahun', plain(r.setahun), {bold:true});
+    c.y += 2;
+    { const cols=[c.M, c.M+46, c.M+100, c.M+142]; c.d.setFontSize(8.5); c.d.setFont('helvetica','bold');
+      ['Masa pajak','Jumlah disetor','Setor paling lambat','Lapor SPT Masa paling lambat'].forEach((t,i)=>c.d.text(t, i===1? cols[1]+38 : cols[i], c.y, i===1?{align:'right'}:{}));
+      c.y += 1.8; c.d.setDrawColor(27,42,51); c.d.line(c.M, c.y, c.W-c.M, c.y); c.y += 4.4;
+      for (let m=0;m<12;m++){
+        if (c.y>278){ c.d.addPage(); c.y=20; }
+        const amt = m<11 ? r.terBulan : Math.max(0, r.des);
+        c.d.setFont('helvetica', m===11?'bold':'normal'); c.d.text(bln[m] + ' ' + TAHUN, cols[0], c.y);
+        c.d.setFont('courier', m===11?'bold':'normal'); c.d.text(plain(amt), cols[1]+38, c.y, {align:'right'});
+        c.d.setFont('helvetica','normal'); c.d.text(due(m,15), cols[2], c.y); c.d.text(due(m,20), cols[3], c.y);
+        c.y += 4.9;
+      }
+      c.d.setFont('helvetica','normal');
+    }
+    c.y += 2;
+    if (r.des<0) para(c, 'Masa Desember tidak ada setoran untuk penerima ini. Kelebihan potongan ' + plain(-r.des) + ' dikembalikan pemberi kerja kepada pegawai bersama gaji Desember.');
+    para(c, 'Cara setor: buat kode billing di Coretax DJP (coretaxdjp.pajak.go.id, menu Pembayaran > Layanan Mandiri Kode Billing) dengan KAP-KJS 411121-100 dan masa pajak sesuai bulan gaji, lalu bayar ke kas negara melalui bank/pos persepsi, internet/mobile banking, atau saldo Deposit Pajak. Laporkan lewat SPT Masa PPh 21/26 di Coretax: bukti potong BPMP untuk Januari-November dan BPA1 (dahulu 1721-A1) untuk Desember. Jika batas waktu jatuh pada hari libur, bergeser ke hari kerja berikutnya.');
+    para(c, 'Perhitungan memakai TER bulanan Lampiran PP 58/2023, tarif Pasal 17 UU HPP, PTKP PMK 101/2016, biaya jabatan 5% (maks. Rp 6.000.000 setahun), dan batas setor/lapor PMK 81/2024. Asumsi: gaji sama setiap bulan selama setahun; belum termasuk bonus/THR, insentif PPh 21 DTP, atau masuk/keluar di tengah tahun.');
+  } else {
+    const r = x.r;
+    h2(c, 'Ringkasan');
+    row(c, 'Honor / imbalan bruto', plain(x.gaji));
+    row(c, 'PPh 21 dipotong', plain(r.tax), {bold:true});
+    row(c, 'Tarif efektif', pctP(r.eff));
+    row(c, 'Diterima bersih', plain(r.net));
+    c.y += 3;
+    h2(c, 'Cara hitung (PMK 168/2023)');
+    row(c, 'Honor / imbalan bruto', plain(x.gaji));
+    row(c, 'Dasar pemotongan = 50% x bruto', plain(r.dpp));
+    r.layers.forEach(l => row(c, pctP(l.r) + ' x ' + plain(l.span), plain(l.tax), {indent:true, muted:true, small:true}));
+    row(c, 'PPh 21 terutang', plain(r.tax), {bold:true, rule:true});
+    c.y += 2;
+    c.y += 2;
+    h2(c, 'Penyetoran dan pelaporan');
+    row(c, 'Yang menyetor', 'Pemberi honor (pemotong)');
+    row(c, 'Jumlah yang disetor', plain(r.tax), {bold:true});
+    row(c, 'Kode akun pajak - jenis setoran (KAP-KJS)', '411121-100', {bold:true});
+    row(c, 'Setor paling lambat', 'tgl 15 bulan berikutnya');
+    row(c, 'Lapor SPT Masa PPh 21/26 paling lambat', 'tgl 20 bulan berikutnya');
+    para(c, 'Pemberi honor membuat kode billing di Coretax DJP (coretaxdjp.pajak.go.id, menu Pembayaran > Layanan Mandiri Kode Billing) dengan KAP-KJS 411121-100 dan masa pajak sesuai bulan pembayaran honor, lalu membayar ke kas negara melalui bank/pos persepsi, internet/mobile banking, atau Deposit Pajak. Penerima mendapat bukti potong BP21 dan mencantumkannya di SPT Tahunan. Jika batas waktu jatuh pada hari libur, bergeser ke hari kerja berikutnya.');
+    para(c, 'Berlaku untuk bukan pegawai (narasumber, konsultan, tenaga ahli, freelancer). Dihitung per pembayaran, tidak diakumulasi antar bulan, tanpa PTKP.');
+  }
+  footer(c);
+  return c.d;
+}
+function pdfAll(){
+  if (!roster.length) return;
+  const btn = $('pdfAll'); const d = buildAll();
+  if (!d){ btn.textContent = 'PDF belum termuat'; return; }
+  savePdf(d, 'Daftar-PPh21-' + new Date().toISOString().slice(0,10) + '.pdf', null).then(()=>{ btn.textContent='PDF diunduh'; setTimeout(()=>btn.textContent='Unduh daftar PDF',2000); });
+}
+function buildAll(){
+  const c = newDoc(); if (!c) return null;
+  c.d.setFont('helvetica','bold'); c.d.setFontSize(16); c.d.text('Daftar Perhitungan PPh Pasal 21', c.M, c.y); c.y += 10;
+  const cols = [ {t:'No',x:c.M}, {t:'Nama',x:c.M+8}, {t:'NIK',x:c.M+52}, {t:'Status',x:c.M+92}, {t:'Bruto/bulan',x:c.M+128,r:true}, {t:'PPh21 Jan-Nov',x:c.M+152,r:true}, {t:'PPh21 Des',x:c.W-c.M,r:true} ];
+  const head = ()=>{ c.d.setFont('helvetica','bold'); c.d.setFontSize(8.5); cols.forEach(k=>c.d.text(k.t,k.x,c.y,k.r?{align:'right'}:{})); c.y+=2; c.d.setDrawColor(27,42,51); c.d.line(c.M,c.y,c.W-c.M,c.y); c.y+=5; };
+  head();
+  let tb=0,tt=0,td=0;
+  roster.forEach((x,i)=>{
+    if (c.y>270){ c.d.addPage(); c.y=20; head(); }
+    const ter = x.mode==='pegawai'? x.r.terBulan : x.r.tax, des = x.mode==='pegawai'? x.r.des : x.r.tax;
+    tb+=x.gaji; tt+=ter; td+=des;
+    c.d.setFont('helvetica','normal'); c.d.setFontSize(8.5);
+    c.d.text(String(i+1), cols[0].x, c.y);
+    c.d.text(c.d.splitTextToSize(x.nama, 42)[0], cols[1].x, c.y);
+    c.d.setFont('courier','normal'); c.d.text(x.nik, cols[2].x, c.y);
+    c.d.setFont('helvetica','normal'); c.d.text(x.mode==='pegawai'? x.status : 'Bukan pegawai', cols[3].x, c.y);
+    c.d.setFont('courier','normal');
+    c.d.text(Math.round(x.gaji).toLocaleString('id-ID'), cols[4].x, c.y, {align:'right'});
+    c.d.text(Math.round(ter).toLocaleString('id-ID'), cols[5].x, c.y, {align:'right'});
+    c.d.text((des<0?'-':'')+Math.round(Math.abs(des)).toLocaleString('id-ID'), cols[6].x, c.y, {align:'right'});
+    c.y += 6;
+  });
+  c.d.setDrawColor(27,42,51); c.d.line(c.M,c.y-3.5,c.W-c.M,c.y-3.5); c.y+=1.5;
+  c.d.setFont('helvetica','bold'); c.d.text('Total', cols[1].x, c.y);
+  c.d.setFont('courier','bold');
+  c.d.text(Math.round(tb).toLocaleString('id-ID'), cols[4].x, c.y, {align:'right'});
+  c.d.text(Math.round(tt).toLocaleString('id-ID'), cols[5].x, c.y, {align:'right'});
+  c.d.text((td<0?'-':'')+Math.round(Math.abs(td)).toLocaleString('id-ID'), cols[6].x, c.y, {align:'right'});
+  c.y += 10;
+  para(c, 'Nilai dalam rupiah. Karyawan tetap: Jan-Nov memakai TER, Desember memakai hitungan setahun Pasal 17. Bukan pegawai: 50% x bruto x tarif Pasal 17 per pembayaran.');
+  footer(c);
+  return c.d;
+}
+
+$('pdfAll').addEventListener('click', pdfAll);
+
+/* ================= PPh BADAN ================= */
+const JENIS = {PT:'PT', PTP:'PT Perorangan', TBK:'PT Terbuka (Tbk)', CV:'CV', FIRMA:'Firma', KOP:'Koperasi', BUMDES:'BUMDes', YDIK:'Yayasan / lembaga pendidikan nirlaba', YLAIN:'Yayasan / perkumpulan'};
+// Hak PPh final UMKM 0,5% untuk tahun pajak 2026 (PP 55/2022 jo. PP 20/2026, berlaku 22 April 2026)
+function finalEligibility(jenis, th, omzet){
+  const yrs = TAHUN - th; // tahun pajak ke-(yrs+1)
+  if (omzet > 4.8e9) return {ok:false, why:'Omzet di atas Rp4,8 miliar setahun, jadi tidak bisa memakai PPh final 0,5%.'};
+  if (jenis==='PTP') return {ok:true, why:'PT Perorangan boleh memakai PPh final 0,5% tanpa batas waktu selama omzet ≤ Rp4,8 miliar (PP 20/2026).'};
+  if (jenis==='KOP') return yrs<4 ? {ok:true, why:'Koperasi boleh memakai PPh final 0,5% selama 4 tahun pajak sejak terdaftar (PP 20/2026). Tahun 2026 adalah tahun ke-'+(yrs+1)+'.'} : {ok:false, why:'Batas 4 tahun pajak sejak terdaftar untuk koperasi sudah lewat. Periksa ketentuan peralihan PP 20/2026 bila koperasi terdaftar 2021–2025.'};
+  if (jenis==='YDIK' || jenis==='YLAIN') return {ok:false, why:'Yayasan dan perkumpulan tidak termasuk wajib pajak yang boleh memakai PPh final UMKM.'};
+  const lim = (jenis==='PT'||jenis==='TBK') ? 3 : 4;
+  if (th >= TAHUN) return {ok:false, why:JENIS[jenis]+' yang terdaftar setelah PP 20/2026 berlaku (22 April 2026) tidak lagi mendapat PPh final 0,5%. Jika terdaftar sebelum tanggal itu, pilih skema final secara manual.'};
+  return yrs<lim ? {ok:true, why:JENIS[jenis]+' yang terdaftar sebelum PP 20/2026 masih boleh memakai sisa jangka waktu PP 55/2022 ('+lim+' tahun pajak sejak terdaftar). Tahun 2026 adalah tahun ke-'+(yrs+1)+'.'}
+                 : {ok:false, why:'Jangka waktu '+lim+' tahun pajak PPh final untuk '+JENIS[jenis]+' sudah habis, jadi memakai tarif umum.'};
+}
+function calcBadan(v){
+  const elig = finalEligibility(v.jenis, v.th, v.omzet);
+  const skema = v.skema==='auto' ? (elig.ok?'final':'umum') : v.skema;
+  if (skema==='final'){
+    const tax = Math.floor(v.omzet*0.005);
+    return {skema, elig, tax, perBulan: Math.floor(v.omzet/12*0.005)};
+  }
+  const yys = v.jenis==='YDIK'||v.jenis==='YLAIN';
+  const fiskal = v.laba + v.korPos - v.korNeg - v.rugi - (v.jenis==='YDIK'? v.tanam : 0) - (yys? (v.hibah||0) : 0);
+  const pkp = Math.max(0, Math.floor(fiskal/1000)*1000);
+  let pkpFas = 0, note, rFull = 0.22;
+  if (v.jenis==='TBK'){ rFull = 0.19; note='PT Terbuka yang memenuhi syarat (≥40% saham disetor diperdagangkan di BEI, dimiliki ≥300 pihak yang masing-masing <5%, selama ≥183 hari setahun) memakai tarif 19% (22% − 3%) atas seluruh PKP, sesuai UU HPP dan PP 55/2022. Pemenuhan syarat dilaporkan dengan lampiran SPT dari Biro Administrasi Efek. Aplikasi tidak menggabungkannya dengan fasilitas Pasal 31E.'; }
+  else if (v.omzet <= 4.8e9){ pkpFas = pkp; note='Omzet ≤ Rp4,8 miliar: seluruh PKP mendapat diskon tarif 50% (efektif 11%).'; }
+  else if (v.omzet <= 50e9){ pkpFas = Math.floor(4.8e9/v.omzet*pkp); note='Omzet Rp4,8–50 miliar: bagian PKP sebanding Rp4,8 miliar/omzet mendapat tarif 11%, sisanya 22%.'; }
+  else note='Omzet di atas Rp50 miliar: seluruh PKP kena tarif 22%.';
+  const tax = Math.floor(pkpFas*0.11 + (pkp-pkpFas)*rFull);
+  const kredit = v.p22+v.p23+v.p24+v.p25;
+  const pph29 = tax - kredit;
+  const pph25 = Math.max(0, Math.floor((tax - v.p22 - v.p23 - v.p24)/12));
+  return {skema, elig, fiskal, pkp, pkpFas, rFull, note, tax, kredit, pph29, pph25};
+}
+const GRUP = {
+  PER:{opts:[['PT','PT (perseroan terbatas)'],['PTP','PT Perorangan'],['TBK','PT Terbuka (Tbk) — tarif 19%']], nama:'Nama perusahaan', ph:'Contoh: PT Maju Bersama Nusantara', jenis:'Jenis perusahaan',
+       omzet:'Peredaran bruto (omzet) setahun 2026', omzetHint:'Total penerimaan usaha sebelum dikurangi biaya.', laba:'Laba sebelum pajak menurut laporan keuangan', labaPh:'400.000.000'},
+  CV:{opts:[['CV','CV (persekutuan komanditer)'],['FIRMA','Firma']], nama:'Nama CV / firma', ph:'Contoh: CV Sumber Rezeki', jenis:'Jenis persekutuan',
+       omzet:'Peredaran bruto (omzet) setahun 2026', omzetHint:'Total penerimaan usaha sebelum dikurangi biaya.', laba:'Laba sebelum pajak menurut laporan keuangan', labaPh:'150.000.000'},
+  YYS:{opts:[['YDIK','Yayasan pendidikan (sekolah, pesantren, kursus)'],['YLAIN','Yayasan / perkumpulan lainnya']], nama:'Nama yayasan', ph:'Contoh: Yayasan Sekolah Alam Nusantara', jenis:'Bidang yayasan',
+       omzet:'Total penerimaan kegiatan setahun 2026 (SPP, uang pangkal, usaha)', omzetHint:'Tidak termasuk sumbangan/hibah yang bukan objek pajak.', laba:'Sisa lebih (surplus) sebelum pajak menurut laporan keuangan', labaPh:'400.000.000'},
+  KOP:{opts:[['KOP','Koperasi'],['BUMDES','BUMDes']], nama:'Nama koperasi / BUMDes', ph:'Contoh: Koperasi Guru Sejahtera', jenis:'Jenis badan',
+       omzet:'Peredaran bruto (omzet) setahun 2026', omzetHint:'Total penerimaan usaha sebelum dikurangi biaya.', laba:'Sisa hasil usaha (SHU) sebelum pajak', labaPh:'100.000.000'}
+};
+const labaNama = j => ({YDIK:'Sisa lebih',YLAIN:'Sisa lebih',KOP:'SHU',BUMDES:'Laba'}[j]||'Laba');
+const grupOf = j => Object.keys(GRUP).find(g=>GRUP[g].opts.some(o=>o[0]===j));
+function setGrup(g, jenis){
+  const G=GRUP[g];
+  document.querySelectorAll('#bGroup button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.grp===g));
+  $('bJenis').innerHTML = G.opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');
+  if (jenis) $('bJenis').value = jenis;
+  $('bNamaLabel').textContent=G.nama; $('bNama').placeholder=G.ph; $('bJenisLabel').textContent=G.jenis;
+  $('bOmzetLabel').textContent=G.omzet; if(!$('bOmzetHint').classList.contains('err')) $('bOmzetHint').textContent=G.omzetHint;
+  $('bLabaLabel').textContent=G.laba; $('bLaba').placeholder=G.labaPh;
+  bSync(); if (lastB && !$('bOut').hidden) runB(false);
+}
+document.querySelectorAll('#bGroup button').forEach(b=>b.addEventListener('click',()=>setGrup(b.dataset.grp)));
+function bVal(){
+  const nama=$('bNama').value.trim(), npwp=$('bNpwp').value.replace(/\D/g,''), th=Number($('bTahun').value)||0, omzet=parseRp($('bOmzet').value);
+  let ok=true;
+  const set=(el,hint,bad,msg,def)=>{ el.classList.toggle('invalid',bad); if(hint){hint.classList.toggle('err',bad); hint.textContent = bad?msg:def;} if(bad&&ok){el.focus(); ok=false;} };
+  set($('bNama'),$('bNamaHint'),!nama,'Nama badan wajib diisi.','Sesuai akta / NPWP.');
+  set($('bNpwp'),$('bNpwpHint'),npwp.length!==16,'NPWP badan harus 16 digit angka.','NPWP 16 digit yang dipakai di Coretax.');
+  set($('bTahun'),null,!(th>=1950 && th<=TAHUN),'','');
+  set($('bOmzet'),$('bOmzetHint'),omzet<=0,'Isi jumlah penerimaan setahun terlebih dahulu.',GRUP[grupOf($('bJenis').value)].omzetHint);
+  if (!ok) return null;
+  return {nama,npwp,th,omzet,jenis:$('bJenis').value,skema:$('bSkema').value,laba:parseRp($('bLaba').value)*(String($('bLaba').value).trim().startsWith('-')?-1:1),
+    korPos:parseRp($('bKorPos').value),korNeg:parseRp($('bKorNeg').value),rugi:parseRp($('bRugi').value),tanam:parseRp($('bTanam').value),hibah:parseRp($('bHibah').value),
+    p22:parseRp($('b22').value),p23:parseRp($('b23').value),p24:parseRp($('b24').value),p25:parseRp($('b25').value)};
+}
+function bSync(){
+  const jenis=$('bJenis').value, th=Number($('bTahun').value)||0, omzet=parseRp($('bOmzet').value);
+  $('bTanamField').hidden = jenis!=='YDIK';
+  $('bHibahField').hidden = !(jenis==='YDIK'||jenis==='YLAIN');
+  let skema=$('bSkema').value;
+  if (skema==='auto' && th && omzet){ const e=finalEligibility(jenis,th,omzet); $('bSkemaHint').textContent='Otomatis: '+(e.ok?'PPh final 0,5%':'tarif umum')+'. '+e.why; skema=e.ok?'final':'umum'; }
+  else if (skema==='auto') $('bSkemaHint').textContent='Pilihan otomatis memakai jenis badan, tahun terdaftar, dan omzet.';
+  else $('bSkemaHint').textContent = skema==='final' ? 'Dipilih manual. Pastikan badan masih berhak memakai PPh final 0,5%.' : 'Dipilih manual: tarif umum 22% dengan fasilitas Pasal 31E.';
+  $('bUmum').hidden = skema==='final';
+}
+['bJenis','bTahun','bOmzet','bSkema'].forEach(id=>$(id).addEventListener('input',bSync));
+['bOmzet','bKorPos','bKorNeg','bRugi','bTanam','bHibah','b22','b23','b24','b25'].forEach(id=>fmtMoney($(id)));
+$('bLaba').addEventListener('input',()=>{ const neg=$('bLaba').value.trim().startsWith('-'); const n=parseRp($('bLaba').value); $('bLaba').value = n? (neg?'-':'')+n.toLocaleString('id-ID') : (neg?'-':''); });
+$('bNpwp').addEventListener('input',()=>{ const d=$('bNpwp').value.replace(/\D/g,'').slice(0,16); $('bNpwp').value=d.replace(/(\d{4})(?=\d)/g,'$1 '); });
+$('bTahun').addEventListener('input',()=>{ $('bTahun').value=$('bTahun').value.replace(/\D/g,'').slice(0,4); });
+let lastB=null;
+function runB(focus=true){
+  const v=bVal(); if(!v) return;
+  const r=calcBadan(v); lastB={v,r};
+  const head = `<div class="who"><div><b>${esc(v.nama)}</b><div class="meta num">NPWP ${nikFmt(v.npwp)}</div></div><span class="badge">${JENIS[v.jenis]} · terdaftar ${v.th}</span></div>`;
+  let body;
+  if (r.skema==='final'){
+    body = `<div class="kpis">
+      <div class="kpi main"><div class="k">PPh final setahun</div><div class="v">${rp(r.tax)}</div></div>
+      <div class="kpi"><div class="k">Rata-rata per bulan</div><div class="v">${rp(r.perBulan)}</div></div>
+      <div class="kpi"><div class="k">Skema</div><div class="v">0,5% omzet</div></div></div>
+      <div class="warn">${esc(r.elig.why)}</div>
+      <div><h3>Cara hitung</h3><table class="steps"><tbody>
+        <tr><td>Omzet setahun</td><td>${rp(v.omzet)}</td></tr>
+        <tr class="total"><td>PPh final = 0,5% × omzet</td><td>${rp(r.tax)}</td></tr></tbody></table>
+        <p class="note" style="margin-top:6px">Dihitung dan disetor setiap bulan: 0,5% × omzet bulan itu. Biaya usaha tidak diperhitungkan. Jika omzet tahun berjalan melewati Rp4,8 miliar, tahun berikutnya wajib memakai tarif umum.</p></div>
+      <div><h3>Penyetoran</h3><table class="steps"><tbody>
+        <tr><td>Yang menyetor</td><td>Badan sendiri</td></tr>
+        <tr><td>KAP-KJS di kode billing</td><td>411128-420</td></tr>
+        <tr><td>Setor paling lambat</td><td>tgl 15 bulan berikutnya</td></tr>
+        <tr><td>SPT Tahunan PPh Badan</td><td>maks. 30 Apr ${TAHUN+1}</td></tr></tbody></table></div>`;
+  } else {
+    const due29 = r.pph29>0 ? `<tr class="total"><td>PPh 29 kurang bayar (setor sebelum SPT dilaporkan)</td><td>${rp(r.pph29)}</td></tr>` : `<tr class="total"><td>PPh lebih bayar (dapat dimintakan pengembalian)</td><td>${rp(-r.pph29)}</td></tr>`;
+    body = `<div class="kpis">
+      <div class="kpi main"><div class="k">PPh Badan terutang 2026</div><div class="v">${rp(r.tax)}</div></div>
+      <div class="kpi"><div class="k">${r.pph29>=0?'PPh 29 kurang bayar':'Lebih bayar'}</div><div class="v">${rp(Math.abs(r.pph29))}</div></div>
+      <div class="kpi"><div class="k">Angsuran PPh 25 / bulan ${TAHUN+1}</div><div class="v">${rp(r.pph25)}</div></div></div>
+      <div class="warn">${esc(r.elig.why)}</div>
+      <div><h3>Penghasilan kena pajak</h3><table class="steps"><tbody>
+        <tr><td>${labaNama(v.jenis)} komersial</td><td>${rpS(v.laba)}</td></tr>
+        ${v.korPos?`<tr><td>Koreksi fiskal positif</td><td>+${rp(v.korPos)}</td></tr>`:''}
+        ${v.korNeg?`<tr><td>Koreksi fiskal negatif</td><td>−${rp(v.korNeg)}</td></tr>`:''}
+        ${v.rugi?`<tr><td>Kompensasi kerugian</td><td>−${rp(v.rugi)}</td></tr>`:''}
+        ${((v.jenis==='YDIK'||v.jenis==='YLAIN')&&v.hibah)?`<tr><td>Sumbangan / hibah diterima (bukan objek)</td><td>−${rp(v.hibah)}</td></tr>`:''}
+        ${(v.jenis==='YDIK'&&v.tanam)?`<tr><td>Sisa lebih ditanam kembali (bukan objek)</td><td>−${rp(v.tanam)}</td></tr>`:''}
+        <tr><td>Penghasilan neto fiskal</td><td>${rpS(r.fiskal)}</td></tr>
+        <tr class="total"><td>PKP (dibulatkan ke bawah ribuan)</td><td>${rp(r.pkp)}</td></tr></tbody></table></div>
+      <div><h3>PPh terutang (${v.jenis==='TBK'?'Pasal 17 ayat 2b, tarif Tbk':'Pasal 17 & 31E'})</h3><table class="steps"><tbody>
+        ${r.pkpFas?`<tr class="sub"><td>&nbsp;&nbsp;11% × ${rp(r.pkpFas)} (fasilitas)</td><td>${rp(r.pkpFas*0.11)}</td></tr>`:''}
+        ${r.pkp-r.pkpFas?`<tr class="sub"><td>&nbsp;&nbsp;${r.rFull*100}% × ${rp(r.pkp-r.pkpFas)}</td><td>${rp((r.pkp-r.pkpFas)*r.rFull)}</td></tr>`:''}
+        <tr><td>PPh Badan terutang</td><td>${rp(r.tax)}</td></tr>
+        ${r.kredit?`<tr><td>Kredit pajak (PPh 22, 23, 24, 25)</td><td>−${rp(r.kredit)}</td></tr>`:''}
+        ${due29}</tbody></table>
+        <p class="note" style="margin-top:6px">${esc(r.note)}</p></div>
+      <div><h3>Penyetoran</h3><table class="steps"><tbody>
+        <tr><td>PPh 29 (kurang bayar)</td><td>411126-200</td></tr>
+        <tr><td>Setor PPh 29 paling lambat</td><td>sebelum SPT dilaporkan</td></tr>
+        <tr><td>SPT Tahunan PPh Badan</td><td>maks. 30 Apr ${TAHUN+1}</td></tr>
+        <tr><td>Angsuran PPh 25 tahun ${TAHUN+1}</td><td>${rp(r.pph25)}/bulan</td></tr>
+        <tr><td>KAP-KJS PPh 25</td><td>411126-100</td></tr>
+        <tr><td>Setor PPh 25 paling lambat</td><td>tgl 15 bulan berikutnya</td></tr></tbody></table>
+        <p class="note" style="margin-top:8px">Kode billing dibuat di Coretax DJP (Pembayaran → Layanan Mandiri Kode Billing), dibayar lewat bank/pos persepsi, mobile banking, atau Deposit Pajak.${v.jenis==='YDIK'?' Lampirkan laporan penggunaan sisa lebih untuk sarana-prasarana pendidikan di SPT Tahunan; sisa lebih yang tidak terpakai dalam 4 tahun menjadi objek pajak.':''}</p></div>`;
+  }
+  $('bOut').innerHTML = head + body + `<div class="btns"><button class="primary" type="button" id="bPdf">Unduh lampiran PDF</button></div><p class="note" id="bPdfMsg" role="status"></p>`;
+  $('bEmpty').hidden=true; $('bOut').hidden=false;
+  $('bPdf').addEventListener('click',()=>{ const d=buildBadan(lastB); if(!d){ $('bPdfMsg').textContent='Pembuat PDF belum termuat. Periksa koneksi internet lalu coba lagi.'; return;} savePdf(d,'Lampiran-PPh-Badan-'+slug(v.nama)+'.pdf',$('bPdfMsg')); });
+  if (focus && window.innerWidth<860) $('bOut').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function buildBadan(x){
+  if(!x) return null; const {v,r}=x;
+  const c=newDoc('Hitung PPh Badan bersama Pak Yendi'); if(!c) return null;
+  c.foot='Disusun dengan kalkulator Hitung PPh Badan bersama Pak Yendi. Perkiraan; bukan pengganti SPT Tahunan.';
+  c.d.setFont('helvetica','bold'); c.d.setFontSize(16); c.d.text('Lampiran Perhitungan PPh Badan', c.M, c.y); c.y+=6;
+  c.d.setFont('helvetica','normal'); c.d.setFontSize(10); c.d.setTextColor(90,106,114); c.d.text('Tahun pajak '+TAHUN, c.M, c.y); c.d.setTextColor(27,42,51); c.y+=10;
+  h2(c,'Identitas');
+  row(c,'Nama badan',v.nama); row(c,'NPWP',nikFmt(v.npwp)); row(c,'Jenis badan',JENIS[v.jenis]); row(c,'Tahun terdaftar',String(v.th));
+  row(c,'Peredaran bruto setahun',plain(v.omzet)); row(c,'Skema', r.skema==='final'?'PPh final UMKM 0,5%':(v.jenis==='TBK'?'Tarif umum Tbk 19%':'Tarif umum (Pasal 17 & 31E)'));
+  c.y+=1; para(c, r.elig.why); c.y+=2;
+  if (r.skema==='final'){
+    h2(c,'Perhitungan');
+    row(c,'Omzet setahun',plain(v.omzet)); row(c,'PPh final = 0,5% x omzet',plain(r.tax),{bold:true,rule:true});
+    row(c,'Rata-rata setoran per bulan',plain(r.perBulan));
+    para(c,'Disetor setiap bulan sebesar 0,5% x omzet bulan tersebut, tanpa memperhitungkan biaya. Jika omzet melewati Rp 4,8 miliar, tahun berikutnya memakai tarif umum.');
+    c.y+=2; h2(c,'Penyetoran dan pelaporan');
+    row(c,'Yang menyetor','Badan sendiri'); row(c,'KAP-KJS','411128-420',{bold:true});
+    row(c,'Setor paling lambat','tgl 15 bulan berikutnya'); row(c,'SPT Tahunan PPh Badan paling lambat','30 April '+(TAHUN+1));
+  } else {
+    h2(c,'Penghasilan kena pajak');
+    row(c,labaNama(v.jenis)+' komersial',plainS(v.laba));
+    if(v.korPos) row(c,'Koreksi fiskal positif','+'+plain(v.korPos));
+    if(v.korNeg) row(c,'Koreksi fiskal negatif','-'+plain(v.korNeg));
+    if(v.rugi) row(c,'Kompensasi kerugian','-'+plain(v.rugi));
+    if((v.jenis==='YDIK'||v.jenis==='YLAIN')&&v.hibah) row(c,'Sumbangan / hibah diterima (bukan objek)','-'+plain(v.hibah));
+    if(v.jenis==='YDIK'&&v.tanam) row(c,'Sisa lebih ditanam kembali ke sarana-prasarana pendidikan (bukan objek)','-'+plain(v.tanam));
+    row(c,'Penghasilan neto fiskal',plainS(r.fiskal));
+    row(c,'Penghasilan kena pajak (dibulatkan ke bawah ribuan)',plain(r.pkp),{bold:true,rule:true});
+    c.y+=2; h2(c, v.jenis==='TBK'?'PPh terutang (tarif perseroan terbuka 19%)':'PPh terutang (Pasal 17 dan Pasal 31E)');
+    if(r.pkpFas) row(c,'11% x '+plain(r.pkpFas)+' (fasilitas Pasal 31E)',plain(r.pkpFas*0.11),{indent:true,small:true,muted:true});
+    if(r.pkp-r.pkpFas) row(c,(r.rFull*100)+'% x '+plain(r.pkp-r.pkpFas),plain((r.pkp-r.pkpFas)*r.rFull),{indent:true,small:true,muted:true});
+    row(c,'PPh Badan terutang',plain(r.tax),{bold:true});
+    if(v.p22) row(c,'Kredit PPh 22',`-${plain(v.p22)}`); if(v.p23) row(c,'Kredit PPh 23',`-${plain(v.p23)}`);
+    if(v.p24) row(c,'Kredit PPh 24',`-${plain(v.p24)}`); if(v.p25) row(c,'PPh 25 sudah dibayar',`-${plain(v.p25)}`);
+    row(c, r.pph29>=0?'PPh 29 kurang bayar':'PPh lebih bayar', plain(Math.abs(r.pph29)), {bold:true,rule:true});
+    para(c, r.note); c.y+=2;
+    h2(c,'Penyetoran dan pelaporan');
+    if (r.pph29>0){ row(c,'PPh 29 yang harus disetor',plain(r.pph29),{bold:true}); row(c,'KAP-KJS PPh 29','411126-200',{bold:true}); row(c,'Setor paling lambat','sebelum SPT Tahunan dilaporkan'); }
+    row(c,'SPT Tahunan PPh Badan paling lambat','30 April '+(TAHUN+1));
+    row(c,'Angsuran PPh 25 per bulan tahun '+(TAHUN+1),plain(r.pph25),{bold:true}); row(c,'KAP-KJS PPh 25','411126-100'); row(c,'Setor PPh 25 paling lambat','tgl 15 bulan berikutnya');
+    para(c,'Cara setor: buat kode billing di Coretax DJP (coretaxdjp.pajak.go.id, menu Pembayaran > Layanan Mandiri Kode Billing), lalu bayar ke kas negara melalui bank/pos persepsi, internet/mobile banking, atau Deposit Pajak. Jika batas waktu jatuh pada hari libur, bergeser ke hari kerja berikutnya.' + (v.jenis==='YDIK'?' Lampirkan laporan penggunaan sisa lebih untuk sarana-prasarana pendidikan pada SPT Tahunan; sisa lebih yang tidak digunakan dalam 4 tahun menjadi objek pajak pada akhir tahun keempat.':''));
+  }
+  c.y+=1; para(c,'Dasar: UU PPh Pasal 17 & 31E (UU HPP), PP 55/2022 jo. PP 20/2026, PMK 68/2020, PMK 90/2020, PMK 81/2024. Belum memperhitungkan insentif lain atau penghasilan final selain UMKM.');
+  footer(c); return c.d;
+}
+$('fb').addEventListener('submit',e=>{e.preventDefault(); runB();});
+$('bContoh').addEventListener('click',()=>{
+  $('bNama').value='Contoh Yayasan Sekolah Alam'; $('bNpwp').value='0012 3456 7890 1000'; setGrup('YYS','YDIK'); $('bTahun').value='2018';
+  $('bOmzet').value=(3e9).toLocaleString('id-ID'); $('bSkema').value='auto'; $('bLaba').value=(400e6).toLocaleString('id-ID');
+  $('bTanam').value=(250e6).toLocaleString('id-ID'); $('b23').value=(2e6).toLocaleString('id-ID'); $('bExtra').open=true; bSync(); runB(false);
+});
+/* tabs */
+const TABTXT = {
+  t21:{eb:'Kalkulator PPh 21 · Tahun pajak 2026', t:'Hitung PPh 21', lead:'Isi nama, NIK, status, dan gaji kotor bulanan. Potongan pajak per bulan, hitungan Desember, dan gaji bersih langsung muncul.', reg:'Dasar: PP 58/2023 · PMK 168/2023 · PMK 81/2024 · UU HPP'},
+  tb:{eb:'Kalkulator PPh Badan · Tahun pajak 2026', t:'Hitung PPh Badan', lead:'Isi nama badan, NPWP, jenis badan, omzet, dan laba setahun. Skema UMKM 0,5% atau tarif umum dipilih otomatis sesuai PP 20/2026.', reg:'Dasar: UU HPP · PP 55/2022 jo. PP 20/2026 · PMK 68/2020 · PMK 81/2024'}
+};
+function showTab(which){
+  const b = which==='tb';
+  $('tab21').hidden=b; $('tabBadan').hidden=!b;
+  $('tabBtn21').setAttribute('aria-selected',!b); $('tabBtnB').setAttribute('aria-selected',b);
+  const t=TABTXT[which]; $('hEyebrow').textContent=t.eb; $('hTitle').textContent=t.t; $('hLead').textContent=t.lead; $('hReg').textContent=t.reg;
+}
+$('tabBtn21').addEventListener('click',()=>showTab('t21'));
+$('tabBtnB').addEventListener('click',()=>showTab('tb'));
+if (location.hash==='#badan') showTab('tb');
+setGrup('PER');
+
+window.__pph21 = {calcPegawai, calcBukan, terRate, buildOne, buildAll, calcBadan, finalEligibility, buildBadan, get last(){return last;}, get lastB(){return lastB;}, roster};
 })();
 </script>
 </body>
