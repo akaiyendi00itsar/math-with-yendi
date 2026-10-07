@@ -67,6 +67,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .levels{display:flex;gap:8px;flex-wrap:wrap}
 .level{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;color:var(--ink);font-weight:500}
 .level[aria-pressed="true"]{background:var(--forest);border-color:var(--forest);color:#fff}
+#kelasList{flex-wrap:nowrap}
+#kelasList .level{padding:8px 4px;flex:1 1 0;min-width:0;white-space:nowrap;font-size:14px;text-align:center}
 .go{background:var(--earth);color:#fff;border:0;border-radius:16px;padding:16px 22px;font-family:var(--font-display);font-size:22px;font-weight:600;box-shadow:0 5px 0 #9A5F18;transition:transform .08s}
 .go:active{transform:translateY(3px);box-shadow:0 2px 0 #9A5F18}
 .best{font-size:14px;color:var(--ink-soft)}
@@ -372,7 +374,14 @@ const TOPICS7 = [
  {id:'sudut', name:'Sudut & Bangun Datar', desc:'Penyiku, pelurus, segitiga, luas', gen:genSudut},
  {id:'data', name:'Statistika', desc:'Rata-rata, median, modus', gen:genStatistika},
 ];
-const KELAS = {5:{label:'Kelas 5 SD', topics:TOPICS5}, 7:{label:'Kelas 7 SMP', topics:TOPICS7}};
+const TOPICS3 = [
+ {id:'cacah', name:'Bilangan sampai 1.000', desc:'Nilai tempat, membandingkan, pola', gen:genCacah},
+ {id:'tamkur', name:'Tambah & Kurang', desc:'Penjumlahan, pengurangan, soal cerita', gen:genTambahKurang},
+ {id:'kalibagi', name:'Kali & Bagi', desc:'Perkalian, pembagian, soal cerita', gen:genKaliBagi},
+ {id:'pecahan3', name:'Pecahan Sederhana', desc:'Gambar arsiran, kue, membandingkan', gen:genPecahan3},
+ {id:'ukur', name:'Waktu, Ukuran & Uang', desc:'Jam, meter, kilogram, kembalian', gen:genUkur},
+];
+const KELAS = {3:{label:'Kelas 3 SD', topics:TOPICS3}, 5:{label:'Kelas 5 SD', topics:TOPICS5}, 7:{label:'Kelas 7 SMP', topics:TOPICS7}};
 let TOPICS = TOPICS5;
 
 function genPecahan(lv){
@@ -631,6 +640,170 @@ function genKecepatan(lv){
     hint:`Ubah menit ke jam dulu: ${menit} menit = ${fmt(menit/60)} jam.`,
     exp:`${menit} menit = ${fmt(menit/60)} jam. ${v} × ${fmt(menit/60)} = ${fmt(s)} km.`, plain:`${v} km/jam selama ${menit} menit`, ansText:`${fmt(s)} km`
   };
+}
+
+/* ---------- Kelas 3 SD ---------- */
+const rp3 = x => 'Rp' + x.toLocaleString('id-ID');
+const ribu = n => n.toLocaleString('id-ID');
+function fracVal(correct, cands){ return options(correct, cands.filter(f=>f && f.d>0 && f.n>0 && f.n<=f.d*2), f=>String(Math.round(f.n/f.d*10000)), f=>fr(f.n,f.d)); }
+function barSVG(n,d){
+  const W=240, w=W/d;
+  return `<svg viewBox="0 0 ${W+4} 44" width="${W+4}" height="44" role="img" aria-label="Persegi panjang dibagi ${d} bagian sama besar, ${n} bagian diarsir" style="display:block;margin:10px 0 2px;max-width:100%">`+
+    Array.from({length:d},(_,i)=>`<rect x="${2+i*w}" y="2" width="${w}" height="40" fill="${i<n?'#C9822B':'#FFFDF7'}" stroke="#1F5B3F" stroke-width="2"/>`).join('')+`</svg>`;
+}
+
+function genCacah(lv){
+  const type = pick(lv===0?['nilai','banding','panjang']:['nilai','banding','panjang','urut', lv===2?'bulat':'nilai']);
+  const n = rnd(lv===0?100:101, 999);
+  const ds = String(n).split('').map(Number);
+  if (type==='nilai'){
+    const pos = rnd(0,2), names=['ratusan','puluhan','satuan'], val=ds[pos]*[100,10,1][pos];
+    if (ds[pos]===0) return genCacah(lv);
+    return { q:`Pada bilangan ${n}, angka ${ds[pos]} menempati tempat ${names[pos]}. Nilainya adalah ...`,
+      opts:numOptions(val,[ds[pos], ds[pos]*[10,100,1000][pos], val*10, n]),
+      hint:'Ratusan bernilai ×100, puluhan ×10, satuan ×1.', exp:`Angka ${ds[pos]} di tempat ${names[pos]} bernilai ${ds[pos]} × ${[100,10,1][pos]} = ${val}.`,
+      plain:`Nilai angka ${ds[pos]} pada ${n}`, ansText:String(val)};
+  }
+  if (type==='panjang'){
+    const txt = `${ds[0]*100} + ${ds[1]*10} + ${ds[2]}`;
+    return { q:`${txt} = ...`, opts:numOptions(n,[ds[0]*100+ds[2]*10+ds[1], ds[0]+ds[1]+ds[2], ds[1]*100+ds[0]*10+ds[2], n+100]),
+      hint:'Jumlahkan ratusan, puluhan, dan satuannya.', exp:`${txt} = ${n}.`, plain:txt, ansText:String(n)};
+  }
+  if (type==='banding'){
+    const arr = shuffle([n, n+rnd(1,9)*(pick([1,10])), Math.max(100,n-rnd(1,90)), Math.max(100, n- rnd(100,300))]);
+    const uniq=[...new Set(arr)]; if (uniq.length<4) return genCacah(lv);
+    const big = Math.max(...uniq), small=Math.min(...uniq), askBig = Math.random()<0.5;
+    return { q:`Bilangan ${askBig?'terbesar':'terkecil'} dari pilihan berikut adalah ...`, opts:options(askBig?big:small, uniq, x=>String(x), x=>String(x)),
+      hint:'Bandingkan ratusannya dulu. Jika sama, bandingkan puluhan, lalu satuan.', exp:`Yang ${askBig?'terbesar':'terkecil'} adalah ${askBig?big:small}.`,
+      plain:`${askBig?'Terbesar':'Terkecil'} dari ${uniq.join(', ')}`, ansText:String(askBig?big:small)};
+  }
+  if (type==='urut'){
+    const step=pick([2,5,10,50,100]), start=rnd(1,8)*step+ (step<10?rnd(0,9)*10:0), seq=[0,1,2,3].map(i=>start+i*step), ans=start+4*step;
+    return { q:`Lanjutkan pola: ${seq.join(', ')}, ...`, opts:numOptions(ans,[ans+step, ans-1, start+3*step+1, ans+10]),
+      hint:`Lihat selisih antar bilangan: ${step}.`, exp:`Setiap bilangan bertambah ${step}, jadi ${seq[3]} + ${step} = ${ans}.`, plain:`Pola ${seq.join(', ')}`, ansText:String(ans)};
+  }
+  const r=Math.round(n/10)*10;
+  return { q:`${n} dibulatkan ke puluhan terdekat menjadi ...`, opts:numOptions(r,[Math.floor(n/10)*10===r?r+10:r-10, Math.round(n/100)*100, n, r+100]),
+    hint:'Lihat angka satuan: 5 atau lebih dibulatkan ke atas, kurang dari 5 ke bawah.', exp:`Satuannya ${n%10}, jadi ${n} dibulatkan menjadi ${r}.`, plain:`Bulatkan ${n}`, ansText:String(r)};
+}
+
+function genTambahKurang(lv){
+  const max=[100,500,999][lv];
+  const type = pick(lv===0?['tambah','kurang']:['tambah','kurang','cerita','cerita']);
+  if (type==='tambah'){
+    const a=rnd(10,max-20), b=rnd(5,max-a), ans=a+b;
+    return { q:`${a} + ${b} = ...`, opts:numOptions(ans,[ans+10, ans-10, ans+1, ans+100]),
+      hint:'Jumlahkan satuan dulu, lalu puluhan, lalu ratusan. Jangan lupa simpanan.', exp:`${a} + ${b} = ${ans}.`, plain:`${a} + ${b}`, ansText:String(ans)};
+  }
+  if (type==='kurang'){
+    const a=rnd(20,max), b=rnd(5,a-1), ans=a-b;
+    return { q:`${a} − ${b} = ...`, opts:numOptions(ans,[ans+10, ans-10, a+b, ans+1]),
+      hint:'Kurangkan satuan dulu. Jika tidak cukup, pinjam dari puluhan.', exp:`${a} − ${b} = ${ans}.`, plain:`${a} − ${b}`, ansText:String(ans)};
+  }
+  const a=rnd(50,max-50), b=rnd(10,Math.min(a-5,300)), naik=Math.random()<0.5;
+  const item=pick(['bibit pohon','buku','kelereng','botol air']);
+  const ans = naik? a+b : a-b;
+  return { q:`<span class="story">${naik?`Sekolah alam punya ${a} ${item}. Datang lagi ${b} ${item}. Berapa jumlah ${item} sekarang?`:`Ada ${a} ${item}. Sebanyak ${b} ${item} dibagikan. Berapa ${item} yang tersisa?`}</span>`,
+    opts:numOptions(ans,[naik?a-b:a+b, ans+10, ans-10, ans+100]),
+    hint: naik?'Kata "datang lagi" berarti ditambah.':'Kata "dibagikan" berarti dikurangi.', exp:`${a} ${naik?'+':'−'} ${b} = ${ans} ${item}.`, plain:`${a} ${naik?'+':'−'} ${b} ${item}`, ansText:`${ans} ${item}`};
+}
+
+function genKaliBagi(lv){
+  const M=[5,10,10][lv];
+  const type = pick(lv===0?['kali','bagi']:['kali','bagi','ceritaKali','ceritaBagi', lv===2?'kali2':'kali']);
+  if (type==='kali'){
+    const a=rnd(2,M), b=rnd(2,10), ans=a*b;
+    return { q:`${a} × ${b} = ...`, opts:numOptions(ans,[a+b, ans+a, ans-b, (a+1)*b]),
+      hint:`${a} × ${b} artinya ${b} ditambahkan sebanyak ${a} kali.`, exp:`${a} × ${b} = ${ans}.`, plain:`${a} × ${b}`, ansText:String(ans)};
+  }
+  if (type==='kali2'){
+    const a=rnd(11,30), b=rnd(2,5), ans=a*b;
+    return { q:`${a} × ${b} = ...`, opts:numOptions(ans,[a+b, ans+b, ans-a, ans+10]),
+      hint:`Pecah ${a} menjadi ${Math.floor(a/10)*10} + ${a%10}, kalikan masing-masing dengan ${b}.`, exp:`${Math.floor(a/10)*10} × ${b} + ${a%10} × ${b} = ${Math.floor(a/10)*10*b} + ${a%10*b} = ${ans}.`, plain:`${a} × ${b}`, ansText:String(ans)};
+  }
+  if (type==='bagi'){
+    const b=rnd(2,M), q=rnd(2,10), a=b*q;
+    return { q:`${a} : ${b} = ...`, opts:numOptions(q,[q+1, q-1>0?q-1:q+2, a-b, b]),
+      hint:`Cari bilangan yang jika dikali ${b} hasilnya ${a}.`, exp:`${b} × ${q} = ${a}, jadi ${a} : ${b} = ${q}.`, plain:`${a} : ${b}`, ansText:String(q)};
+  }
+  if (type==='ceritaKali'){
+    const a=rnd(2,9), b=rnd(3,10), item=pick([['kotak','pensil'],['keranjang','jeruk'],['pot','bunga'],['kantong','kelereng']]);
+    return { q:`<span class="story">Ada ${a} ${item[0]}. Setiap ${item[0]} berisi ${b} ${item[1]}. Berapa jumlah semua ${item[1]}?</span>`,
+      opts:numOptions(a*b,[a+b, a*b+b, a*b-a, (a+1)*b]), hint:`Hitung ${a} × ${b}.`, exp:`${a} × ${b} = ${a*b} ${item[1]}.`, plain:`${a} ${item[0]} × ${b} ${item[1]}`, ansText:`${a*b} ${item[1]}`};
+  }
+  const g=rnd(2,8), q=rnd(2,9), tot=g*q;
+  return { q:`<span class="story">${tot} permen dibagikan sama banyak kepada ${g} anak. Setiap anak mendapat berapa permen?</span>`,
+    opts:numOptions(q,[tot-g, q+1, g, q+2]), hint:`Hitung ${tot} : ${g}.`, exp:`${tot} : ${g} = ${q} permen.`, plain:`${tot} permen : ${g} anak`, ansText:`${q} permen`};
+}
+
+function genPecahan3(lv){
+  const type = pick(lv===0?['arsir','arsir','kue']:(lv===1?['arsir','banding','kue','senama']:['banding','senama','senama','dari']));
+  if (type==='arsir'){
+    const d=pick(lv===0?[2,3,4]:[3,4,5,6,8]), n=rnd(1,d-1);
+    return { q:`Bagian yang diarsir adalah ...${barSVG(n,d)}`, opts:fracVal({n,d},[{n:d-n,d}, {n,d:d+1}, {n:d,d:n}, {n:n+1,d}, {n:n, d:d-n}]),
+      hint:'Penyebut = banyak semua bagian. Pembilang = banyak bagian yang diarsir.', exp:`Ada ${d} bagian, ${n} diarsir, jadi ${n}/${d}.`, plain:`Arsir ${n} dari ${d} bagian`, ansText:`${n}/${d}`};
+  }
+  if (type==='kue'){
+    const d=pick([2,3,4,6,8]), n=rnd(1,d-1), nama=pick(['Dina','Raka','Sari','Bima']);
+    return { q:`<span class="story">Sebuah kue bolu dipotong menjadi ${d} bagian sama besar. ${nama} memakan ${n} potong. Berapa bagian kue yang dimakan ${nama}?</span>`,
+      opts:fracVal({n,d},[{n:d-n,d}, {n:d,d:n+d}, {n:n,d:d+n}, {n:n+1,d}]), hint:'Bagian yang dimakan dibagi semua potongan.', exp:`${n} dari ${d} potong = ${n}/${d}.`, plain:`${n} dari ${d} potong kue`, ansText:`${n}/${d}`};
+  }
+  if (type==='banding'){
+    const same = Math.random()<0.5;
+    let ds = shuffle([2,3,4,5,6,8,10]).slice(0,4), ans, txt, fs;
+    if (same){ const d=pick([6,8,10]); const ns=shuffle([1,2,3,4,5]).slice(0,4); fs=ns.map(n=>({n,d})); }
+    else fs=ds.map(d=>({n:1,d}));
+    const big=Math.random()<0.5;
+    ans = fs.reduce((m,f)=> (big? f.n/f.d>m.n/m.d : f.n/f.d<m.n/m.d) ? f : m);
+    return { q:`Pecahan ${big?'terbesar':'terkecil'} adalah ...`, opts:fracVal(ans, fs),
+      hint: same?'Penyebutnya sama, jadi bandingkan pembilangnya.':'Pembilangnya sama-sama 1. Makin besar penyebut, makin kecil bagiannya.',
+      exp: same?`Penyebut sama, pembilang ${big?'terbesar':'terkecil'} adalah ${ans.n}, jadi ${ans.n}/${ans.d}.`:`Kue dibagi ${ans.d} bagian menghasilkan potongan ${big?'paling besar':'paling kecil'}, jadi 1/${ans.d}.`,
+      plain:`${big?'Terbesar':'Terkecil'}: ${fs.map(f=>f.n+'/'+f.d).join(', ')}`, ansText:`${ans.n}/${ans.d}`};
+  }
+  if (type==='senama'){
+    const d=pick([4,5,6,7,8,9,10]), a=rnd(1,d-2), b=rnd(1,d-1-a), tambah = lv<2 || Math.random()<0.5;
+    const [x,y] = tambah? [a,b] : [a+b, b]; const ans = tambah? a+b : a;
+    return { q:`${fr(x,d)} ${tambah?'+':'−'} ${fr(y,d)} = ...`, opts:fracVal({n:ans,d},[{n:ans,d:d*2}, {n:tambah?Math.abs(x-y)||1:x+y,d}, {n:ans+1,d}, {n:ans, d:d+1}]),
+      hint:'Penyebutnya sama, jadi cukup hitung pembilangnya. Penyebut tetap.', exp:`${x} ${tambah?'+':'−'} ${y} = ${ans}, penyebut tetap ${d}: ${ans}/${d}.`, plain:`${x}/${d} ${tambah?'+':'−'} ${y}/${d}`, ansText:`${ans}/${d}`};
+  }
+  const d=pick([2,3,4,5]), k=rnd(2,6), tot=d*k;
+  return { q:`<span class="story">Ibu membeli ${tot} telur. Sebanyak ${fr(1,d)} bagian dipakai membuat kue. Berapa telur yang dipakai?</span>`,
+    opts:numOptions(k,[tot-k, d, k+1, tot/2===k?k+2:tot/2]), hint:`${fr(1,d)} dari ${tot} artinya ${tot} dibagi ${d}.`, exp:`${tot} : ${d} = ${k} telur.`, plain:`1/${d} dari ${tot} telur`, ansText:`${k} telur`};
+}
+
+function genUkur(lv){
+  const type = pick(lv===0?['jam','cm','uangJumlah']:['jam','cm','kg','uangKembali','jamDurasi']);
+  if (type==='jam'){
+    const h=rnd(6,15), m=pick([0,15,30,45]), add=pick(lv===0?[15,30,60]:[15,30,45,75,90]);
+    const t=h*60+m+add, ans=`${String(Math.floor(t/60)).padStart(2,'0')}.${String(t%60).padStart(2,'0')}`, mula=`${String(h).padStart(2,'0')}.${String(m).padStart(2,'0')}`;
+    return { q:`<span class="story">Kegiatan menanam pohon dimulai pukul ${mula} dan berlangsung ${add} menit. Kegiatan selesai pukul ...</span>`,
+      opts:options(ans,[addMin(h,m,add+15), addMin(h,m,add-15), addMin(h,m,add+60), addMin(h,m,100)], x=>x, x=>'Pukul '+x),
+      hint:'1 jam = 60 menit. Tambahkan menitnya, jika lebih dari 60 jadikan jam.', exp:`${mula} + ${add} menit = pukul ${ans}.`, plain:`${mula} + ${add} menit`, ansText:'Pukul '+ans};
+  }
+  if (type==='jamDurasi'){
+    const j=rnd(1,3), m=pick([0,15,30,45]), ans=j*60+m;
+    return { q:`${j} jam ${m?m+' menit ':''}= ... menit`, opts:numOptions(ans,[j*100+m, j*60, ans+15, j+m]),
+      hint:'1 jam = 60 menit.', exp:`${j} × 60 ${m?'+ '+m+' ':''}= ${ans} menit.`, plain:`${j} jam ${m} menit`, ansText:`${ans} menit`};
+  }
+  if (type==='cm'){
+    const mtr=rnd(1,9), cm= lv===0?0:rnd(1,9)*10, ans=mtr*100+cm;
+    return { q:`${mtr} m ${cm?cm+' cm ':''}= ... cm`, opts:numOptions(ans,[mtr*10+cm, mtr*1000+cm, mtr+cm, ans+100]),
+      hint:'1 meter = 100 cm.', exp:`${mtr} × 100 ${cm?'+ '+cm+' ':''}= ${ans} cm.`, plain:`${mtr} m ${cm} cm`, ansText:`${ans} cm`};
+  }
+  if (type==='kg'){
+    const kg=rnd(1,5), g=pick([0,250,500,750]), ans=kg*1000+g;
+    return { q:`${kg} kg ${g?g+' gram ':''}= ... gram`, opts:numOptions(ans,[kg*100+g, kg+g, ans+1000, kg*10000+g]),
+      hint:'1 kg = 1.000 gram.', exp:`${kg} × 1.000 ${g?'+ '+g+' ':''}= ${ribu(ans)} gram.`, plain:`${kg} kg ${g} g`, ansText:`${ribu(ans)} gram`};
+  }
+  const items=[['pensil',2000],['buku tulis',3500],['penghapus',1500],['penggaris',2500],['roti',5000]];
+  const [a,b]=shuffle(items.slice()).slice(0,2), tot=a[1]+b[1];
+  if (type==='uangJumlah') return { q:`<span class="story">Dina membeli ${a[0]} seharga ${rp3(a[1])} dan ${b[0]} seharga ${rp3(b[1])}. Berapa uang yang harus dibayar?</span>`,
+    opts:options(tot,[tot+1000, tot-500, Math.abs(a[1]-b[1]), tot+500], x=>String(x), rp3),
+    hint:'Jumlahkan kedua harga.', exp:`${rp3(a[1])} + ${rp3(b[1])} = ${rp3(tot)}.`, plain:`${rp3(a[1])} + ${rp3(b[1])}`, ansText:rp3(tot)};
+  const bayar = tot<=10000?10000:20000, kem=bayar-tot;
+  return { q:`<span class="story">Raka membeli ${a[0]} ${rp3(a[1])} dan ${b[0]} ${rp3(b[1])}. Ia membayar dengan uang ${rp3(bayar)}. Berapa kembaliannya?</span>`,
+    opts:options(kem,[tot, kem+1000, kem-500>0?kem-500:kem+1500, bayar-a[1]], x=>String(x), rp3),
+    hint:'Jumlahkan harga dulu, lalu kurangkan dari uang yang dibayarkan.', exp:`${rp3(a[1])} + ${rp3(b[1])} = ${rp3(tot)}. Kembalian ${rp3(bayar)} − ${rp3(tot)} = ${rp3(kem)}.`, plain:`Kembalian dari ${rp3(bayar)}`, ansText:rp3(kem)};
 }
 
 /* ---------- Kelas 7 SMP ---------- */
@@ -913,13 +1086,14 @@ const store = {
 };
 
 /* ---------- setup screen ---------- */
-const kelasAwal = /kelas=?7/.test(location.hash+location.search) ? 7 : (/kelas=?5/.test(location.hash+location.search) ? 5 : (store.get('kelas')===7 ? 7 : 5));
+const kelasUrl = (location.hash+location.search).match(/kelas=?([357])/);
+const kelasAwal = kelasUrl ? Number(kelasUrl[1]) : ([3,5,7].includes(store.get('kelas')) ? store.get('kelas') : 5);
 let state = {topic:'all', level:'sedang', name:'', kelas:kelasAwal};
 const topicList = $('topicList');
 function renderTopics(){
   TOPICS = KELAS[state.kelas].topics; state.topic='all'; topicList.innerHTML='';
   $('subKelas').textContent = 'Jelajah Gunung Matematika · ' + KELAS[state.kelas].label;
-  [...TOPICS, {id:'all', name:'Semua jalur', desc:`Campuran dari ${TOPICS.length===6?'keenam':'kelima'} topik`}].forEach(t=>{
+  [...TOPICS, {id:'all', name:'Semua jalur', desc:`Campuran dari ${({5:'kelima',6:'keenam'})[TOPICS.length]||'semua'} topik`}].forEach(t=>{
     const b = document.createElement('button');
     b.type='button'; b.className='topic'+(t.id==='all'?' all':''); b.dataset.id=t.id;
     b.innerHTML = `<b>${t.name}</b><span>${t.desc}</span>`;
@@ -929,7 +1103,7 @@ function renderTopics(){
   });
 }
 const kelasList = $('kelasList');
-[[5,'Kelas 5 SD'],[7,'Kelas 7 SMP']].forEach(([k,label])=>{
+[[3,'Kelas 3 SD'],[5,'Kelas 5 SD'],[7,'Kelas 7 SMP']].forEach(([k,label])=>{
   const b = document.createElement('button');
   b.type='button'; b.className='level'; b.dataset.id=k; b.textContent=label;
   b.setAttribute('aria-pressed', k===state.kelas);
@@ -961,7 +1135,7 @@ $('parentPhone').addEventListener('input', ()=>{
   $('phoneNote').textContent = v===null ? 'Nomor belum lengkap. Contoh yang benar: 0812 3456 7890.' : 'Hasil latihan bisa dikirim ke nomor ini setelah selesai bermain.';
 });
 function topicName(id){ return id==='all' ? 'Semua jalur' : TOPICS.find(t=>t.id===id).name; }
-const bestKey = () => state.kelas===5 ? `best:${state.topic}:${state.level}` : `best7:${state.topic}:${state.level}`;
+const bestKey = () => state.kelas===5 ? `best:${state.topic}:${state.level}` : `best${state.kelas}:${state.topic}:${state.level}`;
 function updateBest(){
   const b = store.get(bestKey());
   $('bestLine').textContent = b ? `Rekor di perangkat ini untuk ${topicName(state.topic)} (${state.level}): ${b.score} poin oleh ${b.name}.` : `Belum ada rekor untuk ${topicName(state.topic)} (${state.level}). Jadilah yang pertama!`;
@@ -971,6 +1145,7 @@ updateBest();
 /* ---------- game ---------- */
 const TIME = {mudah:45, sedang:30, sulit:25};
 let G = null, timerId = null;
+const timeLimit = () => TIME[state.level] + (state.kelas===3 ? 15 : 0);
 
 function newQuestion(){
   const t = state.topic==='all' ? pick(TOPICS) : TOPICS.find(x=>x.id===state.topic);
@@ -1017,7 +1192,7 @@ function nextQuestion(){
 }
 function startTimer(){
   clearInterval(timerId);
-  const total = TIME[state.level]; G.t0 = performance.now();
+  const total = timeLimit(); G.t0 = performance.now();
   const bar = $('timerBar'), tm = $('timer');
   const tick = ()=>{
     const left = Math.max(0, total - (performance.now()-G.t0)/1000);
@@ -1036,8 +1211,8 @@ function answer(idx){
   const ok = idx===correctIdx;
   const fb = $('feedback'); fb.hidden=false; fb.className = 'feedback ' + (ok?'ok':'no');
   if (ok){
-    const left = Math.max(0, TIME[state.level] - (performance.now()-G.t0)/1000);
-    const gain = 10 + Math.round(left/TIME[state.level]*10) - (G.hinted?5:0);
+    const left = Math.max(0, timeLimit() - (performance.now()-G.t0)/1000);
+    const gain = 10 + Math.round(left/timeLimit()*10) - (G.hinted?5:0);
     G.score += Math.max(5,gain); G.pos++;
     $('fbTitle').textContent = pick(['Benar! Naik satu pos.','Mantap, kamu naik!','Tepat sekali!','Hebat, terus mendaki!']);
     beep([523,659,784]);
@@ -1085,7 +1260,7 @@ function finish(){
     `Status: ${G.pos>=N ? 'sampai di puncak' : 'berhenti di pos '+G.pos+' dari '+N}`,
     ...(wrong.length ? [``, `Soal yang perlu dipelajari lagi:`, ...wrong.slice(0,5).map(l=>`- ${strip(l.q)} (jawaban: ${l.a})`)] : [``, `Semua soal dijawab benar. Hebat!`]),
     ``,
-    `Main lagi: https://akaiyendi00itsar.github.io/math-with-yendi/${state.kelas===7?'#kelas7':''}`,
+    `Main lagi: https://akaiyendi00itsar.github.io/math-with-yendi/${state.kelas!==5?'#kelas'+state.kelas:''}`,
     `Pak Yendi · @pakyendi.id`
   ].join('\n');
   G.msg = msg;
