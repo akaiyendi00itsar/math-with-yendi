@@ -140,6 +140,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .field input.invalid{border-color:var(--bad);background:#FFF6F4}
 .share{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 18px}
 .share .note{flex-basis:100%}
+.pdfbtn{display:inline-flex;align-items:center;gap:8px;background:#C9822B;color:#fff;border:0;border-radius:14px;padding:12px 18px;font-weight:600;box-shadow:0 4px 0 #9A6320;cursor:pointer;font:inherit;font-weight:600}
+.pdfbtn:disabled{opacity:.6;cursor:wait}
 .wa{display:inline-flex;align-items:center;gap:8px;background:#1D8A4E;color:#fff;text-decoration:none;border-radius:14px;padding:12px 18px;font-weight:600;box-shadow:0 4px 0 #136437}
 .wa:hover{background:#18784A}
 .foot{margin-top:10px;font-size:13px;color:var(--ink-soft)}
@@ -275,7 +277,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
             <span id="waLabel">Kirim hasil ke WhatsApp orang tua</span>
           </a>
           <button class="iconbtn" type="button" id="copyBtn">Salin pesan</button>
+          <button class="pdfbtn" type="button" id="pdfBtn">Unduh laporan PDF</button>
           <p class="note" id="waNote"></p>
+          <p class="note" id="pdfMsg" role="status"></p>
         </div>
         <div class="row">
           <button class="go" type="button" id="againBtn">Daki lagi</button>
@@ -297,6 +301,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <p class="foot">Soal dibuat acak setiap permainan, jadi bisa dimainkan berkali-kali. Tombol 1–4 pada keyboard bisa dipakai untuk menjawab, Enter untuk lanjut.</p>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -1145,6 +1150,7 @@ updateBest();
 /* ---------- game ---------- */
 const TIME = {mudah:45, sedang:30, sulit:25};
 let G = null, timerId = null;
+const PLAY_URL = 'https://akaiyendi00itsar.github.io/math-with-yendi/';
 const timeLimit = () => TIME[state.level] + (state.kelas===3 ? 15 : 0);
 
 function newQuestion(){
@@ -1224,7 +1230,7 @@ function answer(idx){
     beep([330,247],0.16);
   }
   $('fbText').innerHTML = `<b>Pembahasan:</b> ${G.q.exp}`;
-  G.log.push({q:G.q.plain, a:G.q.ansText, ok, exp:G.q.exp});
+  G.log.push({q:G.q.plain, a:G.q.ansText, ok, exp:G.q.exp, topic:G.q.topic, pilih: idx>=0 ? G.q.opts[idx].html : '', hint:G.hinted});
   G.i++;
   $('score').textContent = G.score; $('pos').textContent = `${G.pos}/${N}`; renderLives(); moveClimber(G.pos);
   $('nextBtn').textContent = (G.i>=N || G.lives<=0) ? 'Lihat hasil' : 'Lanjut';
@@ -1260,10 +1266,10 @@ function finish(){
     `Status: ${G.pos>=N ? 'sampai di puncak' : 'berhenti di pos '+G.pos+' dari '+N}`,
     ...(wrong.length ? [``, `Soal yang perlu dipelajari lagi:`, ...wrong.slice(0,5).map(l=>`- ${strip(l.q)} (jawaban: ${l.a})`)] : [``, `Semua soal dijawab benar. Hebat!`]),
     ``,
-    `Main lagi: https://akaiyendi00itsar.github.io/math-with-yendi/${state.kelas!==5?'#kelas'+state.kelas:''}`,
+    `Main lagi: ${PLAY_URL}${state.kelas!==5?'#kelas'+state.kelas:''}`,
     `Pak Yendi · @pakyendi.id`
   ].join('\n');
-  G.msg = msg;
+  G.msg = msg; G.stars = stars; G.correct = correct; G.tgl = tgl;
   const esc = t => t.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   $('msgPreview').innerHTML = esc(msg).replace(/\*([^*\n]+)\*/g,'<b>$1</b>');
   $('waLink').href = `https://wa.me/${state.phone}?text=${encodeURIComponent(msg)}`;
@@ -1271,7 +1277,7 @@ function finish(){
   $('waNote').textContent = state.phone
     ? `WhatsApp akan terbuka ke nomor +${state.phone} dengan pesan yang sudah terisi. Ketuk Kirim di WhatsApp.`
     : `Nomor orang tua belum diisi, jadi pilih kontaknya sendiri di WhatsApp. Jika WhatsApp tidak terbuka, pakai Salin pesan.`;
-  $('copyBtn').textContent = 'Salin pesan';
+  $('copyBtn').textContent = 'Salin pesan'; $('pdfMsg').textContent='';
   if (G.pos>=N) beep([523,659,784,1047],0.15);
   show('resultScreen');
 }
@@ -1294,6 +1300,118 @@ $('copyBtn').addEventListener('click', ()=>{
   };
   try{ navigator.clipboard.writeText(G.msg).then(done, fallback); }catch(e){ fallback(); }
 });
+
+/* ---------- laporan PDF ---------- */
+const toText = h => String(h||'')
+  .replace(/<svg[\s\S]*?<\/svg>/g,'')
+  .replace(/(\d)<span class="frac"><span class="n">(\d+)<\/span><span class="d">(\d+)<\/span><\/span>/g,'$1 $2/$3')
+  .replace(/<span class="frac"><span class="n">(\d+)<\/span><span class="d">(\d+)<\/span><\/span>/g,'$1/$2')
+  .replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
+const pdfSafe = t => toText(t).replace(/−/g,'-').replace(/→/g,'->').replace(/≤/g,'<=').replace(/≥/g,'>=').replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/–|—/g,'-').replace(/[^\x00-\xFF]/g,'');
+let LOGO_PNG = null;
+function logoPng(){
+  if (LOGO_PNG) return Promise.resolve(LOGO_PNG);
+  const svgEl = document.querySelector('.brand svg'); if (!svgEl) return Promise.resolve(null);
+  const xml = new XMLSerializer().serializeToString(svgEl).replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"').replace(/xmlns="http:\/\/www.w3.org\/2000\/svg" xmlns=/,'xmlns=');
+  return new Promise(res=>{
+    const img = new Image();
+    img.onload = ()=>{ try{ const c=document.createElement('canvas'); c.width=c.height=240; const g=c.getContext('2d'); g.fillStyle='#1F5B3F'; g.fillRect(0,0,240,240); g.drawImage(img,0,0,240,240); LOGO_PNG=c.toDataURL('image/jpeg',0.9); res(LOGO_PNG);}catch(e){res(null);} };
+    img.onerror = ()=>res(null);
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+  });
+}
+async function buildReport(){
+  const J = window.jspdf && window.jspdf.jsPDF; if (!J) return null;
+  const logo = await logoPng();
+  const d = new J({unit:'mm', format:'a4', compress:true}); const W=210, H=297, M=16; let y;
+  const ink=[23,50,42], forest=[31,91,63], amber=[201,130,43], muted=[90,106,100], line=[214,226,218];
+  const header = (first)=>{
+    d.setFillColor(...forest); d.rect(0,0,W,first?32:16,'F');
+    if (first){
+      if (logo) { try{ d.addImage(logo,'JPEG',M,5,22,22); }catch(e){} }
+      d.setTextColor(255,255,255); d.setFont('helvetica','bold'); d.setFontSize(17); d.text('Math with Pak Yendi', M+27, 14);
+      d.setFont('helvetica','normal'); d.setFontSize(9.5); d.text('Laporan Hasil Latihan Matematika  |  Jelajah Gunung Matematika', M+27, 20);
+      d.text('Pak Yendi Septiyendi, S.Kom., Gr.  |  IG @pakyendi.id  |  Les privat Matematika', M+27, 25);
+      y = 42;
+    } else { d.setTextColor(255,255,255); d.setFont('helvetica','bold'); d.setFontSize(10); d.text('Math with Pak Yendi  |  Laporan ' + pdfSafe(state.name), M, 10); y = 24; }
+    d.setTextColor(...ink);
+  };
+  const need = h => { if (y + h > H - 18){ d.addPage(); header(false); } };
+  const h2 = t => { need(14); d.setFont('helvetica','bold'); d.setFontSize(11); d.setTextColor(...forest); d.text(t.toUpperCase(), M, y); y+=2; d.setDrawColor(...line); d.line(M,y,W-M,y); y+=6; d.setTextColor(...ink); };
+  header(true);
+  // identitas
+  d.setFont('helvetica','bold'); d.setFontSize(15); d.text(pdfSafe(state.name), M, y); y+=6;
+  d.setFont('helvetica','normal'); d.setFontSize(10); d.setTextColor(...muted);
+  d.text(pdfSafe(`${KELAS[state.kelas].label}  |  Jalur: ${topicName(state.topic)}  |  Tingkat: ${state.level}  |  ${G.tgl}`), M, y); y+=10; d.setTextColor(...ink);
+  // ringkasan kotak
+  const boxes = [['Benar', `${G.correct} / ${G.log.length}`], ['Skor', String(G.score)], ['Bintang', `${G.stars} / 3`], ['Pos dicapai', `${G.pos} / ${N}`]];
+  const bw = (W-2*M-3*4)/4;
+  boxes.forEach(([k,v],i)=>{ const x=M+i*(bw+4); d.setFillColor(i===0?232:246, i===0?243:243, i===0?236:235); d.roundedRect(x,y,bw,20,3,3,'F');
+    d.setFontSize(8.5); d.setTextColor(...muted); d.text(k.toUpperCase(), x+4, y+7); d.setFont('helvetica','bold'); d.setFontSize(14); d.setTextColor(...(i===0?forest:ink)); d.text(v, x+4, y+15.5); d.setFont('helvetica','normal'); });
+  y += 28; d.setTextColor(...ink);
+  const pct = G.log.length ? Math.round(G.correct/G.log.length*100) : 0;
+  const status = G.pos>=N ? 'Sampai di puncak' : `Berhenti di pos ${G.pos} dari ${N}`;
+  d.setFontSize(10); d.text(pdfSafe(`Status: ${status}. Ketepatan menjawab ${pct}%. ${G.log.filter(l=>l.hint).length} kali memakai petunjuk.`), M, y); y+=9;
+  // per topik
+  const per = {}; G.log.forEach(l=>{ const t=l.topic||'-'; per[t]=per[t]||{b:0,n:0}; per[t].n++; if(l.ok) per[t].b++; });
+  h2('Hasil per topik');
+  Object.entries(per).forEach(([t,v])=>{ need(8); d.setFontSize(10); d.text(pdfSafe(t), M, y); d.text(`${v.b} dari ${v.n} benar`, W-M-50, y);
+    const bx=W-M-22, bwid=22; d.setFillColor(...line); d.rect(bx,y-3,bwid,3.5,'F'); d.setFillColor(...(v.b/v.n>=0.7?forest:amber)); d.rect(bx,y-3,bwid*v.b/v.n,3.5,'F'); y+=7; });
+  y+=3;
+  // rincian soal
+  h2('Rincian jawaban');
+  G.log.forEach((l,i)=>{
+    const soal = d.splitTextToSize(pdfSafe(l.q), W-2*M-24);
+    const pil = l.pilih ? pdfSafe(l.pilih) : '(waktu habis)';
+    const jaw = d.splitTextToSize(pdfSafe(`Jawaban siswa: ${pil}   |   Jawaban benar: ${l.a}`), W-2*M-24);
+    const exp = d.splitTextToSize(pdfSafe('Pembahasan: ' + l.exp), W-2*M-24);
+    const h = 4.8 + 5*soal.length + 4.6*jaw.length + 4.4*exp.length + 6;
+    need(h);
+    d.setFillColor(...(l.ok?[46,122,85]:[192,57,43])); d.circle(M+4, y-1.2, 3.6, 'F');
+    d.setTextColor(255,255,255); d.setFont('helvetica','bold'); d.setFontSize(9); d.text(String(i+1), M+4, y, {align:'center'});
+    d.setFontSize(8.5); d.setTextColor(...(l.ok?[31,91,63]:[192,57,43]));
+    d.text((l.ok?'BENAR':'BELUM TEPAT') + (l.topic?`  |  ${pdfSafe(l.topic)}`:''), M+12, y); y += 4.8;
+    d.setTextColor(...ink); d.setFontSize(10.5); d.text(soal, M+12, y); y += 5*soal.length;
+    d.setFont('helvetica','normal'); d.setFontSize(9.5);
+    d.setTextColor(...ink); d.text(jaw, M+12, y); y += 4.6*jaw.length;
+    d.setTextColor(...muted); d.text(exp, M+12, y); y += 4.4*exp.length + 4; d.setTextColor(...ink);
+  });
+  // saran
+  const lemah = Object.entries(per).filter(([t,v])=>v.b/v.n<0.7).map(([t])=>t);
+  h2('Catatan untuk orang tua');
+  const saran = G.correct===G.log.length && G.pos>=N
+    ? `Luar biasa! ${state.name} menjawab semua soal dengan benar. Coba naikkan tingkat kesulitan atau pilih jalur lain agar tetap tertantang.`
+    : (lemah.length ? `${state.name} masih perlu berlatih pada topik: ${lemah.join(', ')}. Ajak membaca ulang pembahasan di atas, lalu mainkan lagi jalur tersebut di tingkat yang sama sampai bisa mencapai puncak.`
+       : `${state.name} sudah cukup baik. Latihan rutin 10-15 menit sehari akan membantu menjawab lebih cepat dan tepat.`);
+  const sl = d.splitTextToSize(pdfSafe(saran), W-2*M); need(5*sl.length+4); d.setFontSize(10); d.text(sl, M, y); y += 5*sl.length + 4;
+  // footer tiap halaman
+  const pages = d.getNumberOfPages();
+  for (let i=1;i<=pages;i++){ d.setPage(i); d.setFontSize(8); d.setTextColor(...muted); d.setDrawColor(...line); d.line(M,H-14,W-M,H-14);
+    d.text(pdfSafe('Main lagi: ' + PLAY_URL + '   |   Dibuat oleh Math with Pak Yendi'), M, H-9); d.text(`Hal. ${i}/${pages}`, W-M, H-9, {align:'right'}); }
+  return {doc:d};
+}
+async function saveFile(blob, filename){
+  try{
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+    if (dl){ await dl.save({filename, data: blob}); return 'PDF tersimpan: ' + filename; }
+  }catch(e){ if (e && e.code==='declined') return 'Unduhan dibatalkan.'; }
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  return 'PDF diunduh: ' + filename;
+}
+$('pdfBtn').addEventListener('click', async ()=>{
+  const btn=$('pdfBtn'); btn.disabled=true; $('pdfMsg').textContent='Menyiapkan laporan...';
+  try{
+    const res = await buildReport(); const doc = res && res.doc;
+    if (!doc){ $('pdfMsg').textContent='Pembuat PDF belum termuat. Periksa koneksi internet lalu coba lagi.'; return; }
+    const slug = String(state.name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'siswa';
+    const tg = new Date(); const ds = `${tg.getFullYear()}-${String(tg.getMonth()+1).padStart(2,'0')}-${String(tg.getDate()).padStart(2,'0')}`;
+    $('pdfMsg').textContent = await saveFile(doc.output('blob'), `Laporan-Math-${slug}-${ds}.pdf`);
+  } catch(e){ $('pdfMsg').textContent='Laporan gagal dibuat. Coba lagi.'; }
+  finally{ btn.disabled=false; }
+});
+
 $('againBtn').addEventListener('click', startGame);
 $('menuBtn').addEventListener('click', ()=>{ updateBest(); show('startScreen'); });
 
