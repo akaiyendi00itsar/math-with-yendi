@@ -220,6 +220,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <div class="legend" id="levelLegend">Tingkat kesulitan</div>
           <div class="levels" role="group" aria-labelledby="levelLegend" id="levelList"></div>
         </div>
+        <div>
+          <div class="legend" id="timeLegend">Batas waktu</div>
+          <div class="levels" role="group" aria-labelledby="timeLegend" id="timeList"></div>
+        </div>
         <button class="go" type="submit">Mulai mendaki</button>
         <div class="best" id="bestLine"></div>
       </form>
@@ -1093,7 +1097,7 @@ const store = {
 /* ---------- setup screen ---------- */
 const kelasUrl = (location.hash+location.search).match(/kelas=?([357])/);
 const kelasAwal = kelasUrl ? Number(kelasUrl[1]) : ([3,5,7].includes(store.get('kelas')) ? store.get('kelas') : 5);
-let state = {topic:'all', level:'sedang', name:'', kelas:kelasAwal};
+let state = {topic:'all', level:'sedang', name:'', kelas:kelasAwal, timed:true};
 const topicList = $('topicList');
 function renderTopics(){
   TOPICS = KELAS[state.kelas].topics; state.topic='all'; topicList.innerHTML='';
@@ -1124,6 +1128,15 @@ const levelList = $('levelList');
   b.addEventListener('click',()=>{ state.level=id; [...levelList.children].forEach(x=>x.setAttribute('aria-pressed', x.dataset.id===id)); updateBest(); });
   levelList.appendChild(b);
 });
+const timeList = $('timeList');
+if (store.get('timed') === false) state.timed = false;
+[[true,'Pakai waktu'],[false,'Tanpa waktu']].forEach(([v,label])=>{
+  const b = document.createElement('button');
+  b.type='button'; b.className='level'; b.dataset.id=v?'1':'0'; b.textContent=label;
+  b.setAttribute('aria-pressed', v===state.timed);
+  b.addEventListener('click',()=>{ state.timed=v; store.set('timed',v); [...timeList.children].forEach(x=>x.setAttribute('aria-pressed', x.dataset.id===(v?'1':'0'))); updateBest(); });
+  timeList.appendChild(b);
+});
 const savedName = store.get('name'); if (savedName) $('playerName').value = savedName;
 const savedPhone = store.get('phone'); if (savedPhone) $('parentPhone').value = savedPhone;
 // Normalise Indonesian numbers to 62xxxxxxxxxx; returns '' when empty, null when invalid
@@ -1140,10 +1153,11 @@ $('parentPhone').addEventListener('input', ()=>{
   $('phoneNote').textContent = v===null ? 'Nomor belum lengkap. Contoh yang benar: 0812 3456 7890.' : 'Hasil latihan bisa dikirim ke nomor ini setelah selesai bermain.';
 });
 function topicName(id){ return id==='all' ? 'Semua jalur' : TOPICS.find(t=>t.id===id).name; }
-const bestKey = () => state.kelas===5 ? `best:${state.topic}:${state.level}` : `best${state.kelas}:${state.topic}:${state.level}`;
+const bestKey = () => (state.kelas===5 ? `best:${state.topic}:${state.level}` : `best${state.kelas}:${state.topic}:${state.level}`) + (state.timed ? '' : ':tanpawaktu');
+const modeLabel = () => state.timed ? state.level : `${state.level}, tanpa waktu`;
 function updateBest(){
   const b = store.get(bestKey());
-  $('bestLine').textContent = b ? `Rekor di perangkat ini untuk ${topicName(state.topic)} (${state.level}): ${b.score} poin oleh ${b.name}.` : `Belum ada rekor untuk ${topicName(state.topic)} (${state.level}). Jadilah yang pertama!`;
+  $('bestLine').textContent = b ? `Rekor di perangkat ini untuk ${topicName(state.topic)} (${modeLabel()}): ${b.score} poin oleh ${b.name}.` : `Belum ada rekor untuk ${topicName(state.topic)} (${modeLabel()}). Jadilah yang pertama!`;
 }
 updateBest();
 
@@ -1198,6 +1212,8 @@ function nextQuestion(){
 }
 function startTimer(){
   clearInterval(timerId);
+  $('timer').hidden = !state.timed;
+  if (!state.timed){ G.t0 = performance.now(); $('timeLeft').textContent = 'Tanpa batas waktu'; return; }
   const total = timeLimit(); G.t0 = performance.now();
   const bar = $('timerBar'), tm = $('timer');
   const tick = ()=>{
@@ -1218,7 +1234,8 @@ function answer(idx){
   const fb = $('feedback'); fb.hidden=false; fb.className = 'feedback ' + (ok?'ok':'no');
   if (ok){
     const left = Math.max(0, timeLimit() - (performance.now()-G.t0)/1000);
-    const gain = 10 + Math.round(left/timeLimit()*10) - (G.hinted?5:0);
+    const bonus = state.timed ? Math.round(left/timeLimit()*10) : 0;
+    const gain = 10 + bonus - (G.hinted?5:0);
     G.score += Math.max(5,gain); G.pos++;
     $('fbTitle').textContent = pick(['Benar! Naik satu pos.','Mantap, kamu naik!','Tepat sekali!','Hebat, terus mendaki!']);
     beep([523,659,784]);
@@ -1250,7 +1267,7 @@ function finish(){
   const key = bestKey(), best = store.get(key);
   let rec = '';
   if (G.score>0 && (!best || G.score > best.score)){ store.set(key,{score:G.score,name:state.name}); rec = ' Ini rekor baru di perangkat ini!'; }
-  $('resText').textContent = `${correct} dari ${G.log.length} soal benar di jalur ${topicName(state.topic)} (${KELAS[state.kelas].label}), tingkat ${state.level}.${rec}` + (G.pos<N ? ' Coba lagi untuk mencapai puncak.' : '');
+  $('resText').textContent = `${correct} dari ${G.log.length} soal benar di jalur ${topicName(state.topic)} (${KELAS[state.kelas].label}), tingkat ${modeLabel()}.${rec}` + (G.pos<N ? ' Coba lagi untuk mencapai puncak.' : '');
   $('recap').innerHTML = G.log.map(l=>`<li><span class="mark ${l.ok?'y':'n'}">${l.ok?'✓':'✗'}</span><div><div class="q">${l.q}</div><div class="a">Jawaban: ${l.a}. ${l.exp}</div></div></li>`).join('');
   // WhatsApp report for parents
   const wrong = G.log.filter(l=>!l.ok);
@@ -1260,7 +1277,7 @@ function finish(){
     `Halo Bapak/Ibu, berikut hasil latihan matematika ${state.name} di *Math with Pak Yendi*.`,
     ``,
     `Tanggal: ${tgl}`,
-    `Materi: ${KELAS[state.kelas].label} · ${topicName(state.topic)} (tingkat ${state.level})`,
+    `Materi: ${KELAS[state.kelas].label} · ${topicName(state.topic)} (tingkat ${modeLabel()})`,
     `Benar: ${correct} dari ${G.log.length} soal`,
     `Skor: ${G.score} · Bintang: ${stars}/3`,
     `Status: ${G.pos>=N ? 'sampai di puncak' : 'berhenti di pos '+G.pos+' dari '+N}`,
@@ -1342,7 +1359,7 @@ async function buildReport(){
   // identitas
   d.setFont('helvetica','bold'); d.setFontSize(15); d.text(pdfSafe(state.name), M, y); y+=6;
   d.setFont('helvetica','normal'); d.setFontSize(10); d.setTextColor(...muted);
-  d.text(pdfSafe(`${KELAS[state.kelas].label}  |  Jalur: ${topicName(state.topic)}  |  Tingkat: ${state.level}  |  ${G.tgl}`), M, y); y+=10; d.setTextColor(...ink);
+  d.text(pdfSafe(`${KELAS[state.kelas].label}  |  Jalur: ${topicName(state.topic)}  |  Tingkat: ${modeLabel()}  |  ${G.tgl}`), M, y); y+=10; d.setTextColor(...ink);
   // ringkasan kotak
   const boxes = [['Benar', `${G.correct} / ${G.log.length}`], ['Skor', String(G.score)], ['Bintang', `${G.stars} / 3`], ['Pos dicapai', `${G.pos} / ${N}`]];
   const bw = (W-2*M-3*4)/4;
