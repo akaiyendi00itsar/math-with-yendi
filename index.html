@@ -147,7 +147,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .foot{margin-top:10px;font-size:13px;color:var(--ink-soft)}
 .credit{margin-top:24px;padding:14px 18px;border-radius:16px;background:var(--forest);color:#EAF4EE;font-size:14px;display:flex;align-items:center;gap:14px}
 .credit-text{display:flex;flex-direction:column;gap:2px;min-width:0}
-.credit svg{border:3px solid #F6E3C3;border-radius:50%;box-sizing:content-box}
+.credit-avatar{flex:none;width:52px;height:52px;object-fit:cover;object-position:46% 35%;border:3px solid #F6E3C3;border-radius:50%;box-sizing:content-box;background:#2E7A55}
 .credit b{color:#fff}
 .byline{display:inline-block;margin-top:14px;background:var(--earth-soft);color:#7A4A10;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
 
@@ -298,8 +298,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </section>
 
   <footer class="credit">
-    <svg width="52" height="52" viewBox="0 0 400 400" aria-hidden="true" style="flex:none"><circle cx="200" cy="200" r="196" fill="#2E7A55"/><path d="M4 255 L80 185 L130 228 L190 160 L250 222 L300 175 L396 250 L396 270 L4 270 Z" fill="#7FB069" opacity=".55"/><path d="M78 400 C84 318 140 290 200 290 C260 290 316 318 322 400 Z" fill="#1F3A5F"/><path d="M160 298 L200 350 L240 298 L228 292 L200 318 L172 292 Z" fill="#FFFDF7"/><path d="M194 318 L206 318 L210 360 L200 372 L190 360 Z" fill="#17322A"/><rect x="176" y="246" width="48" height="56" rx="14" fill="#A8693F"/><ellipse cx="129" cy="196" rx="13" ry="22" fill="#B97A4C"/><ellipse cx="271" cy="196" rx="13" ry="22" fill="#B97A4C"/><ellipse cx="200" cy="190" rx="70" ry="86" fill="#C68A5C"/><path d="M131 182 C122 112 162 90 204 92 C250 94 282 118 270 182 C264 150 252 134 238 126 C214 140 176 138 152 128 C142 142 135 160 131 182 Z" fill="#1A1A1A"/><path d="M157 166 Q173 157 189 163 M211 163 Q227 157 243 166" stroke="#1A1A1A" stroke-width="7" stroke-linecap="round" fill="none"/><ellipse cx="174" cy="186" rx="6.5" ry="5" fill="#1A1A1A"/><ellipse cx="226" cy="186" rx="6.5" ry="5" fill="#1A1A1A"/><rect x="148" y="171" width="50" height="32" rx="10" fill="none" stroke="#141414" stroke-width="5"/><rect x="202" y="171" width="50" height="32" rx="10" fill="none" stroke="#141414" stroke-width="5"/><path d="M198 184 Q200 180 202 184 M148 182 L131 178 M252 182 L269 178" stroke="#141414" stroke-width="4" fill="none"/><path d="M200 196 Q193 218 197 224 Q202 228 210 223" stroke="#8E5532" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M178 236 Q200 228 222 236 Q200 241 178 236 Z" fill="#2A2A2A"/><path d="M180 247 Q200 264 220 247" stroke="#6E2E1E" stroke-width="5" stroke-linecap="round" fill="none"/></svg>
-    <div class="credit-text"><div><b>Math with Pak Yendi</b> dibuat oleh Pak Yendi Septiyendi, S.Kom., Gr. · Guru Informatika & Matematika</div>
+    <img class="credit-avatar" src="https://pakyendi.com/tulisan/wp-content/uploads/2026/10/avatar-karikatur-pak-yendi.jpg" alt="Karikatur Pak Yendi" width="52" height="52" loading="lazy">
+    <div class="credit-text"><div><b>Math with Pak Yendi</b> dibuat oleh Pak Yendi Septiyendi, S.Kom., Gr., CTT · Guru Informatika & Matematika</div>
     <div>Instagram <b>@pakyendi.id</b> · Les privat Matematika & konsultasi sekolah alam</div></div>
   </footer>
   <p class="foot">Soal dibuat acak setiap permainan, jadi bisa dimainkan berkali-kali. Tombol 1–4 pada keyboard bisa dipakai untuk menjawab, Enter untuk lanjut.</p>
@@ -1348,7 +1348,7 @@ async function buildReport(){
       if (logo) { try{ d.addImage(logo,'JPEG',M,5,22,22); }catch(e){} }
       d.setTextColor(255,255,255); d.setFont('helvetica','bold'); d.setFontSize(17); d.text('Math with Pak Yendi', M+27, 14);
       d.setFont('helvetica','normal'); d.setFontSize(9.5); d.text('Laporan Hasil Latihan Matematika  |  Jelajah Gunung Matematika', M+27, 20);
-      d.text('Pak Yendi Septiyendi, S.Kom., Gr.  |  IG @pakyendi.id  |  Les privat Matematika', M+27, 25);
+      d.text('Pak Yendi Septiyendi, S.Kom., Gr., CTT  |  IG @pakyendi.id  |  Les privat Matematika', M+27, 25);
       y = 42;
     } else { d.setTextColor(255,255,255); d.setFont('helvetica','bold'); d.setFontSize(10); d.text('Math with Pak Yendi  |  Laporan ' + pdfSafe(state.name), M, 10); y = 24; }
     d.setTextColor(...ink);
